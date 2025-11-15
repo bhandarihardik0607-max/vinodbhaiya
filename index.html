@@ -3,32 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jersey Inventory Pro (Supabase)</title>
-    <!-- 1. Tailwind CSS for styling -->
+    <title>Business Dashboard</title>
+    
+    <!-- 1. Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- 2. QRCode.js for generating the QR code -->
+    <!-- 2. QRCode.js for Share Page -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <!-- 3. Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- 4. Chart.js for Dashboard (optional, but good for reports) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        /* Simple transition for tab content */
-        .tab-content {
-            transition: opacity 0.3s ease-in-out;
-        }
         /* Hide scrollbars for a cleaner look */
-        body::-webkit-scrollbar { display: none; }
+        ::-webkit-scrollbar { display: none; }
         body { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* Style for file input button */
-        input[type="file"]::file-selector-button {
-            @apply cursor-pointer rounded-lg border-0 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition hover:bg-green-100;
+        /* Main content transitions */
+        .page-content {
+            transition: opacity 0.2s ease-in-out;
+        }
+        
+        /* Active/Inactive Sidebar Link Styles */
+        .sidebar-link {
+            @apply flex items-center p-3 my-1 rounded-lg text-gray-200 hover:bg-green-600 transition-colors duration-200;
+        }
+        .sidebar-link-active {
+            @apply bg-green-700 text-white font-semibold;
+        }
+        
+        /* Custom styles for POS */
+        .pos-item-selected {
+            @apply ring-2 ring-green-500 border-transparent;
         }
     </style>
 </head>
-<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+<body class="bg-gray-100 font-sans">
 
     <!-- =========== LOADING SPINNER =========== -->
     <div id="loading-spinner" class="fixed inset-0 z-50 flex h-screen w-full flex-col items-center justify-center bg-white">
@@ -36,278 +49,485 @@
         <p id="loading-text" class="mt-4 text-lg font-medium text-gray-700">Loading Dashboard...</p>
     </div>
 
-    <!-- =========== PUBLIC SHARE PAGE =========== -->
-    <!-- This view is shown ONLY if the URL hash is #share/... -->
-    <div id="share-view" class="hidden min-h-screen w-full items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 p-4">
-        <!-- This section is unchanged, it already looks attractive -->
-        <div class="w-full max-w-md transform rounded-2xl bg-white p-8 text-center shadow-2xl transition-all">
-            <div id="share-page-status">
-                <div class="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-t-indigo-500 border-gray-200"></div>
-                <p class="mt-4 text-lg font-medium text-gray-600">Loading contact links...</p>
+    <!-- Main App Wrapper -->
+    <div id="app-view" class="hidden min-h-screen lg:flex">
+        
+        <!-- Sidebar Navigation -->
+        <nav class="w-64 flex-shrink-0 bg-gray-800 text-white">
+            <div class="flex h-20 items-center justify-center bg-gray-900 shadow-md">
+                <h1 class="text-2xl font-bold text-white">Ommen's Fashion</h1>
             </div>
-            
-            <div id="share-page-links" class="hidden space-y-6">
-                <h1 class="text-3xl font-bold text-gray-800">Connect With Us</h1>
-                <p class="text-lg text-gray-600">We'd love to hear from you!</p>
+            <div class="p-4">
+                <a href="#dashboard" class="sidebar-link sidebar-link-active">
+                    <svg class="h-6 w-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2a1 1 0 01-1-1v-4z"></path></svg>
+                    Dashboard
+                </a>
+                <a href="#pos" class="sidebar-link">
+                    <svg class="h-6 w-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    Point of Sale (POS)
+                </a>
+                <a href="#sales-history" class="sidebar-link">
+                    <svg class="h-6 w-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Sales History
+                </a>
+                <a href="#reports" class="sidebar-link">
+                    <svg class="h-6 w-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0l6 0m-6 0v-6a2 2 0 012-2h2a2 2 0 012 2v6m0 0v-6a2 2 0 00-2-2h-2a2 2 0 00-2 2v6m0 0l6 0m-6 0l6 0"></path></svg>
+                    Reports
+                </a>
                 
-                <!-- NEW: Call Us Button -->
-                <a id="call-link" href="#" target="_blank" rel="noopener noreferrer" class="group flex w-full transform items-center justify-center space-x-3 rounded-xl bg-blue-500 p-4 text-xl font-bold text-white shadow-lg transition hover:-translate-y-1 hover:bg-blue-600">
-                    <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"></path></svg>
-                    <span>Call Us</span>
-                </a>
-
-                <a id="whatsapp-link" href="#" target="_blank" rel="noopener noreferrer" class="group flex w-full transform items-center justify-center space-x-3 rounded-xl bg-green-500 p-4 text-xl font-bold text-white shadow-lg transition hover:-translate-y-1 hover:bg-green-600">
-                    <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.06 21.94L7.3 20.58C8.77 21.39 10.37 21.82 12.04 21.82C17.5 21.82 21.95 17.37 21.95 11.91C21.95 6.45 17.5 2 12.04 2ZM17.23 15.26C16.98 15.91 15.82 16.5 15.19 16.56C14.63 16.61 13.9 16.62 13.22 16.43C12.44 16.22 11.4 15.92 10.23 14.8C8.82 13.43 7.84 11.77 7.6 11.02C7.36 10.27 7.55 9.61 7.74 9.32C7.94 9.03 8.21 8.79 8.5 8.5C8.79 8.21 8.94 8.04 9.09 7.8C9.24 7.56 9.17 7.35 9.07 7.15C8.97 6.95 8.32 5.31 8.07 4.81C7.82 4.31 7.57 4.37 7.37 4.37C7.17 4.37 6.97 4.37 6.77 4.37C6.57 4.37 6.22 4.47 5.92 4.76C5.62 5.06 4.97 5.66 4.97 6.81C4.97 7.96 5.97 9.06 6.12 9.26C6.27 9.46 7.42 11.38 9.34 12.31C10.96 13.08 11.35 13.23 11.78 13.4C12.4 13.62 12.96 13.59 13.43 13.5C13.96 13.41 15.12 12.8 15.42 12.1C15.72 11.4 15.72 10.85 15.62 10.65C15.52 10.45 15.37 10.35 15.12 10.1C14.87 9.85 13.77 9.29 13.52 9.19C13.27 9.09 13.07 9.04 12.87 9.29C12.67 9.54 12.22 10.1 12.07 10.3C11.92 10.5 11.77 10.55 11.52 10.3C11.27 10.05 10.59 9.81 9.77 9.07C9.11 8.48 8.65 7.78 8.4 7.43C8.15 7.08 8.06 6.86 8.21 6.66C8.36 6.46 8.54 6.28 8.74 6.11C8.94 5.94 9.14 5.79 9.34 5.79C9.54 5.79 9.74 5.89 9.89 6.19C10.04 6.49 10.69 8.13 10.94 8.63C11.19 9.13 11.44 9.19 11.64 9.19C11.84 9.19 12.04 9.09 12.24 8.99C12.44 8.89 13.54 8.33 13.79 8.23C14.04 8.13 14.24 8.18 14.44 8.43C14.64 8.68 15.09 9.24 15.24 9.44C15.39 9.64 15.54 9.69 15.79 9.59C16.04 9.49 16.93 8.93 17.18 8.83C17.43 8.73 17.63 8.78 17.83 9.03C18.03 9.28 18.23 9.84 18.23 10.09C18.23 10.34 18.23 10.59 18.18 10.69C18.13 10.79 17.48 11.35 17.23 15.26Z"></path></svg>
-                    <span>Chat on WhatsApp</span>
-                </a>
-                
-                <a id="instagram-link" href="#" target="_blank" rel="noopener noreferrer" class="group flex w-full transform items-center justify-center space-x-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 p-4 text-xl font-bold text-white shadow-lg transition hover:-translate-y-1 hover:shadow-xl">
-                    <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.148 3.227-1.669 4.771-4.919 4.919-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-3.252-.148-4.771-1.691-4.919-4.919-.058-1.265-.07-1.646-.07-4.85s.012-3.584.07-4.85c.148-3.227 1.669 4.771 4.919-4.919 1.266-.058 1.646-.07 4.85-.07zm0-2.163c-3.259 0-3.667.014-4.947.072-4.286.195-6.126 2.033-6.321 6.321C.014 8.333 0 8.741 0 12s.014 3.667.072 4.947c.196 4.287 2.035 6.127 6.321 6.321C8.333 23.986 8.741 24 12 24s3.667-.014 4.947-.072c4.287-.196 6.127-2.035 6.321-6.321C23.986 15.667 24 15.259 24 12s-.014-3.667-.072-4.947c-.196-4.287-2.035-6.127-6.321-6.321C15.667.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 1 2.881.001 1.44 1.44 0 0 1-2.881-.001z"></path></svg>
-                    <span>Follow on Instagram</span>
-                </a>
-            </div>
-            <p id="share-page-error" class="hidden text-xl font-bold text-red-600">Error: Contact links not found or invalid QR code.</p>
-        </div>
-    </div>
-
-    <!-- =========== MAIN MANAGER APP =========== -->
-    <div id="app-view" class="hidden min-h-screen w-full">
-        <!-- Header -->
-        <header class="sticky top-0 z-30 w-full bg-gradient-to-r from-green-600 to-teal-700 p-4 shadow-lg">
-            <div class="mx-auto flex max-w-7xl items-center justify-between">
-                <h1 class="text-3xl font-bold text-white">Jersey Inventory Pro</h1>
-                <div class="text-right">
-                    <p id="user-id-display" class="text-xs text-teal-200"></p>
-                    <button id="logout-btn" class="text-sm font-medium text-white hover:text-teal-200">Logout</button>
-                </div>
-            </div>
-        </header>
-
-        <!-- Navigation Tabs -->
-        <nav class="sticky top-[72px] z-20 w-full bg-white shadow-sm">
-            <div class="mx-auto flex max-w-7xl justify-center space-x-2 border-b border-gray-200 px-4 sm:space-x-8">
-                <button id="nav-inventory" class="nav-tab active-tab whitespace-nowrap px-3 py-4 font-medium text-green-600 border-b-2 border-green-600 sm:px-6">
+                <p class="mt-4 mb-1 px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Manage</p>
+                <a href="#inventory" class="sidebar-link">
+                    <svg class="h-6 w-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
                     Inventory
-                </button>
-                <button id="nav-customers" class="nav-tab inactive-tab whitespace-nowrap px-3 py-4 font-medium text-gray-500 hover:text-gray-700 sm:px-6">
+                </a>
+                <a href="#add-inventory" class="sidebar-link">
+                    <svg class="h-6 w-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Add Inventory
+                </a>
+                <a href="#customers" class="sidebar-link">
+                    <svg class="h-6 w-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 016-6h6v1a6 6 0 01-6 6v-1zm6-3a3 3 0 100-6 3 3 0 000 6z"></path></svg>
                     Customers
-                </button>
-                <button id="nav-share" class="nav-tab inactive-tab whitespace-nowrap px-3 py-4 font-medium text-gray-500 hover:text-gray-700 sm:px-6">
+                </a>
+                <a href="#add-customer" class="sidebar-link">
+                    <svg class="h-6 w-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                    Add Customer
+                </a>
+                <a href="#expenses" class="sidebar-link">
+                    <svg class="h-6 w-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 8h6m-4 4h4m2 0h-2m2 0h2M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    Expenses
+                </a>
+                
+                <p class="mt-4 mb-1 px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Settings</p>
+                <a href="#share" class="sidebar-link">
+                    <svg class="h-6 w-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path></svg>
                     Share Page
-                </button>
+                </a>
             </div>
         </nav>
 
         <!-- Main Content Area -->
-        <main class="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
-
-            <!-- =========== INVENTORY TAB =========== -->
-            <div id="inventory-tab-content" class="tab-content">
-                <!-- Add Inventory Form -->
-                <form id="add-inventory-form" class="mb-8 rounded-lg bg-white p-6 shadow-lg">
-                    <h2 class="mb-6 border-b border-gray-200 pb-3 text-2xl font-semibold text-green-800">Add New Jersey</h2>
-                    <div class="grid grid-cols-1 gap-6 md:grid-cols-5">
-                        <!-- Jersey Name -->
-                        <div>
-                            <label for="jersey-name" class="block text-sm font-medium text-gray-700">Jersey Name</label>
-                            <input type="text" id="jersey-name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
-                        </div>
-                        <!-- Size -->
-                        <div>
-                            <label for="jersey-size" class="block text-sm font-medium text-gray-700">Size</label>
-                            <select id="jersey-size" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
-                                <option>S</option>
-                                <option>M</option>
-                                <option>L</option>
-                                <option>XL</option>
-                                <option>XXL</option>
-                                <option>Other</option>
-                            </select>
-                        </div>
-                        <!-- Stock Quantity -->
-                        <div>
-                            <label for="jersey-stock" class="block text-sm font-medium text-gray-700">Stock Quantity</label>
-                            <input type="number" id="jersey-stock" required min="0" value="1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
-                        </div>
-                        <!-- Price -->
-                        <div>
-                            <label for="jersey-price" class="block text-sm font-medium text-gray-700">Price (₹)</label>
-                            <input type="number" id="jersey-price" min="0" step="1" placeholder="e.g., 1499" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
-                        </div>
-                        <!-- Jersey Image -->
-                        <div>
-                            <label for="jersey-image" class="block text-sm font-medium text-gray-700">Jersey Image</label>
-                            <input type="file" id="jersey-image" accept="image/png, image/jpeg, image/webp" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-green-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-green-700 hover:file:bg-green-100"/>
-                        </div>
-                    </div>
-                    <div class="mt-6 text-right">
-                        <button type="submit" id="add-stock-btn" class="transform rounded-lg bg-green-600 px-6 py-2.5 font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
-                            Add to Stock
-                        </button>
-                    </div>
-                </form>
-
-                <!-- Inventory List -->
-                <h2 class="mb-4 text-2xl font-semibold text-gray-800">Current Stock</h2>
-                <div id="inventory-list" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    <p id="inventory-loading" class="text-gray-500 col-span-full">Loading inventory...</p>
+        <div class="flex-1 flex flex-col h-screen">
+            <!-- Top Bar -->
+            <header class="h-20 flex-shrink-0 bg-white shadow-md flex items-center justify-end px-8">
+                <div class="text-right">
+                    <p id="user-id-display" class="text-xs text-gray-500"></p>
+                    <button id="logout-btn" class="text-sm font-medium text-green-600 hover:text-green-800">Logout</button>
                 </div>
-            </div>
+            </header>
 
-            <!-- =========== CUSTOMERS TAB =========== -->
-            <div id="customers-tab-content" class="tab-content hidden">
-                <!-- Add Customer Form -->
-                <form id="add-customer-form" class="mb-8 rounded-lg bg-white p-6 shadow-lg">
-                    <h2 class="mb-6 border-b border-gray-200 pb-3 text-2xl font-semibold text-green-800">Add New Customer</h2>
-                    <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-                        <!-- Customer Name -->
-                        <div>
-                            <label for="customer-name" class="block text-sm font-medium text-gray-700">Customer Name</label>
-                            <input type="text" id="customer-name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
+            <!-- Page Content -->
+            <main id="main-content" class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+                
+                <!-- =========== PAGE: DASHBOARD (Cost/Income) =========== -->
+                <div id="dashboard-page" class="page-content">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6">Dashboard</h1>
+                    <div id="dashboard-loading" class="text-center text-gray-500">Loading stats...</div>
+                    <div id="dashboard-stats" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-white rounded-lg shadow-lg p-6 flex items-center">
+                            <div class="bg-green-100 rounded-full p-3">
+                                <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2zM0 14s3-2 6-2 6 2 6 2v4H0v-4zm12 0s3-2 6-2 6 2 6 2v4h-6v-4zm0 0v4h6m-6-4H6"></path></svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-500">Total Revenue</p>
+                                <p id="stat-revenue" class="text-2xl font-bold text-gray-900">₹0.00</p>
+                            </div>
                         </div>
-                        <!-- Contact Info -->
-                        <div>
-                            <label for="customer-contact" class="block text-sm font-medium text-gray-700">Contact (Phone/Email)</label>
-                            <input type="text" id="customer-contact" placeholder="e.g., 9876543210" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
+                        <div class="bg-white rounded-lg shadow-lg p-6 flex items-center">
+                            <div class="bg-blue-100 rounded-full p-3">
+                                <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 8h6m-4 4h4m2 0h-2m2 0h2M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-500">Total Expenses</p>
+                                <p id="stat-expenses" class="text-2xl font-bold text-gray-900">₹0.00</p>
+                            </div>
                         </div>
-                        <!-- Category -->
-                        <div>
-                            <label for="customer-category" class="block text-sm font-medium text-gray-700">Category</label>
-                            <select id="customer-category" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
-                                <option value="regular">Regular</option>
-                                <option value="mid">Middle Class</option>
-                                <option value="high">High Class</option>
-                            </select>
+                        <div class="bg-white rounded-lg shadow-lg p-6 flex items-center">
+                            <div class="bg-yellow-100 rounded-full p-3">
+                                <svg class="h-8 w-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-500">Total Profit</p>
+                                <p id="stat-profit" class="text-2xl font-bold text-gray-900">₹0.00</p>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow-lg p-6 flex items-center">
+                            <div class="bg-purple-100 rounded-full p-3">
+                                <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-500">Net Income</p>
+                                <p id="stat-net-income" class="text-2xl font-bold text-gray-900">₹0.00</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="mt-6 text-right">
-                        <button type="submit" class="transform rounded-lg bg-green-600 px-6 py-2.5 font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
-                            Add Customer
-                        </button>
+                    <!-- Chart placeholder -->
+                    <div class="bg-white rounded-lg shadow-lg p-6 mt-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Sales vs Expenses (Last 30 Days)</h2>
+                        <canvas id="main-chart" class="w-full"></canvas>
                     </div>
-                </form>
-
-                <!-- Customer List -->
-                <h2 class="mb-4 text-2xl font-semibold text-gray-800">Customer List</h2>
-                <div id="customer-list" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    <p id="customers-loading" class="text-gray-500 col-span-full">Loading customers...</p>
                 </div>
-            </div>
 
-            <!-- =========== SHARE PAGE TAB =========== -->
-            <div id="share-tab-content" class="tab-content hidden">
-                <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                    <div class="rounded-lg bg-white p-6 text-center shadow-lg">
-                        <h2 class="mb-4 text-2xl font-semibold text-green-800">Your Shareable QR Code</h2>
-                        <p class="mb-4 text-gray-600">Have customers scan this code to see your social links.</p>
-                        <div id="qrcode-container" class="mx-auto flex h-64 w-64 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-gray-500">
-                            Generating...
+                <!-- =========== PAGE: POINT OF SALE (POS) =========== -->
+                <div id="pos-page" class="page-content hidden">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6">Point of Sale (POS)</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Left: Product Selection -->
+                        <div class="lg:col-span-2">
+                            <div class="bg-white rounded-lg shadow-lg p-6">
+                                <h2 class="text-xl font-semibold text-gray-800 mb-4">Select Products to Sell</h2>
+                                <input type="text" id="pos-search" placeholder="Search products..." class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 mb-4">
+                                <div id="pos-inventory-list" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-96 overflow-y-auto p-2 bg-gray-50 rounded-lg">
+                                    <!-- Products load here -->
+                                </div>
+                            </div>
                         </div>
                         
-                        <!-- Button Group -->
-                        <div class="mt-4 flex items-center justify-center space-x-3">
-                            <button id="print-qr-btn" class="transform rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white shadow-md transition hover:-translate-y-0.5 hover:bg-blue-700">
-                                Print QR
-                            </button>
-                            <button id="copy-link-btn" class="rounded-lg bg-gray-100 px-5 py-2 text-sm font-medium text-gray-800 hover:bg-gray-200">
-                                Copy Link
-                            </button>
+                        <!-- Right: Cart -->
+                        <div class="lg:col-span-1">
+                            <div class="bg-white rounded-lg shadow-lg p-6 sticky top-6">
+                                <h2 class="text-xl font-semibold text-gray-800 mb-4">Current Sale</h2>
+                                <div id="pos-cart" class="space-y-3 mb-4 min-h-[100px] max-h-60 overflow-y-auto">
+                                    <p id="pos-cart-empty" class="text-gray-500 text-center">No items in cart.</p>
+                                </div>
+                                <div class="border-t pt-4 space-y-2">
+                                    <div class="flex justify-between items-center text-lg font-semibold">
+                                        <span>Total:</span>
+                                        <span id="pos-cart-total" class="text-green-600">₹0.00</span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="pos-customer" class="text-sm font-medium text-gray-700">Customer (Optional)</label>
+                                        <input type="text" id="pos-customer" placeholder="Walk-in Customer" class="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
+                                    </div>
+                                    <button id="record-sale-btn" class="w-full transform rounded-lg bg-green-600 px-6 py-3 font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50" disabled>
+                                        Record Sale
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-
-                        <div class="mt-4">
-                            <p class="text-sm font-medium text-gray-700">Your unique share link:</p>
-                            <input id="shareable-link" type="text" readonly class="w-full rounded-md border-none bg-gray-100 p-2 text-center text-sm text-gray-600" value="Loading..." />
-                        </div>
-                    </div>
-                    <div class="rounded-lg bg-white p-6 shadow-lg">
-                        <h2 class="mb-6 border-b border-gray-200 pb-3 text-2xl font-semibold text-green-800">Configure Share Page</h2>
-                        <form id="share-settings-form" class="space-y-6">
-                            <div>
-                                <label for="whatsapp-url" class="block text-sm font-medium text-gray-700">WhatsApp Link</label>
-                                <input type="url" id="whatsapp-url" placeholder="https://wa.me/919876543210" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
-                                <p class="mt-1 text-xs text-gray-500">Use the format `https://wa.me/91...`</p>
-                            </div>
-                            <!-- NEW: Phone Number Input -->
-                            <div>
-                                <label for="phone-number" class="block text-sm font-medium text-gray-700">Phone Number (for Calls)</label>
-                                <input type="text" id="phone-number" placeholder="7793036608" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
-                                <p class="mt-1 text-xs text-gray-500">Just the 10-digit number. `+91` will be added.</p>
-                            </div>
-                            <div>
-                                <label for="instagram-url" class="block text-sm font-medium text-gray-700">Instagram Link</label>
-                                <input type="url" id="instagram-url" placeholder="https://instagram.com/yourprofile" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
-                            </div>
-                            <div class="text-right">
-                                <button type="submit" class="transform rounded-lg bg-green-500 px-6 py-2.5 font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
-                                    Save Links
-                                </button>
-                            </div>
-                            <p id="save-links-success" class="hidden text-center font-medium text-green-600">Links saved successfully!</p>
-                        </form>
                     </div>
                 </div>
-            </div>
 
-        </main>
-        
-        <!-- Toast Notification -->
-        <div id="toast" class="fixed bottom-10 right-10 z-50 hidden transform rounded-lg bg-gray-900 px-5 py-3 text-white shadow-lg transition-all">
-            <span id="toast-message"></span>
+                <!-- =========== PAGE: SALES HISTORY =========== -->
+                <div id="sales-history-page" class="page-content hidden">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6">Sales History</h1>
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                    <th class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                                    <th class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
+                                    <th class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                    <th class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profit</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sales-history-table" class="divide-y divide-gray-200">
+                                <!-- Sales load here -->
+                            </tbody>
+                        </table>
+                        <div id="sales-history-loading" class="p-4 text-center text-gray-500">Loading sales history...</div>
+                    </div>
+                </div>
+
+                <!-- =========== PAGE: REPORTS (Highest Selling) =========== -->
+                <div id="reports-page" class="page-content hidden">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6">Reports</h1>
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Top Selling Products</h2>
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
+                                    <th class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Name</th>
+                                    <th class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Units Sold</th>
+                                </tr>
+                            </thead>
+                            <tbody id="top-selling-table" class="divide-y divide-gray-200">
+                                <!-- Products load here -->
+                            </tbody>
+                        </table>
+                        <div id="reports-loading" class="p-4 text-center text-gray-500">Calculating reports...</div>
+                    </div>
+                </div>
+                
+                <!-- =========== PAGE: INVENTORY (List) =========== -->
+                <div id="inventory-page" class="page-content hidden">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6">Inventory</h1>
+                    <div id="inventory-list-loading" class="text-center text-gray-500">Loading inventory...</div>
+                    <div id="inventory-list-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Inventory cards load here -->
+                    </div>
+                </div>
+                
+                <!-- =========== PAGE: ADD INVENTORY (Form) =========== -->
+                <div id="add-inventory-page" class="page-content hidden">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6">Add New Inventory</h1>
+                    <form id="add-inventory-form" class="max-w-3xl mx-auto rounded-lg bg-white p-6 shadow-lg">
+                        <div class="space-y-6">
+                            <div>
+                                <label for="jersey-name" class="block text-sm font-medium text-gray-700">Jersey Name</label>
+                                <input type="text" id="jersey-name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="jersey-size" class="block text-sm font-medium text-gray-700">Size</label>
+                                    <select id="jersey-size" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
+                                        <option>S</option>
+                                        <option>M</option>
+                                        <option>L</option>
+                                        <option>XL</option>
+                                        <option>XXL</option>
+                                        <option>Other</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="jersey-stock" class="block text-sm font-medium text-gray-700">Stock Quantity</label>
+                                    <input type="number" id="jersey-stock" required min="0" value="1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="jersey-cost" class="block text-sm font-medium text-gray-700">Your Cost (₹)</label>
+                                    <input type="number" id="jersey-cost" min="0" step="1" placeholder="e.g., 800" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
+                                </div>
+                                <div>
+                                    <label for="jersey-price" class="block text-sm font-medium text-gray-700">Selling Price (₹)</label>
+                                    <input type="number" id="jersey-price" min="0" step="1" placeholder="e.g., 1499" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
+                                </div>
+                            </div>
+                            <div>
+                                <label for="jersey-image" class="block text-sm font-medium text-gray-700">Jersey Image</label>
+                                <input type="file" id="jersey-image" accept="image/png, image/jpeg, image/webp" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:cursor-pointer file:rounded-lg file:border-0 file:bg-green-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-green-700 hover:file:bg-green-100"/>
+                            </div>
+                        </div>
+                        <div class="mt-8 text-right">
+                            <button type="submit" id="add-stock-btn" class="transform rounded-lg bg-green-600 px-6 py-2.5 font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                                Add to Stock
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- =========== PAGE: CUSTOMERS (List) =========== -->
+                <div id="customers-page" class="page-content hidden">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6">Customers</h1>
+                    <div id="customers-loading" class="text-center text-gray-500">Loading customers...</div>
+                    <div id="customer-list-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Customer cards load here -->
+                    </div>
+                </div>
+                
+                <!-- =========== PAGE: ADD CUSTOMER (Form) =========== -->
+                <div id="add-customer-page" class="page-content hidden">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6">Add New Customer</h1>
+                    <form id="add-customer-form" class="max-w-3xl mx-auto rounded-lg bg-white p-6 shadow-lg">
+                        <div class="space-y-6">
+                            <div>
+                                <label for="customer-name" class="block text-sm font-medium text-gray-700">Customer Name</label>
+                                <input type="text" id="customer-name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label for="customer-contact" class="block text-sm font-medium text-gray-700">Contact (Phone/Email)</label>
+                                <input type="text" id="customer-contact" placeholder="e.g., 9876543210" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label for="customer-category" class="block text-sm font-medium text-gray-700">Category</label>
+                                <select id="customer-category" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
+                                    <option value="regular">Regular</option>
+                                    <option value="mid">Middle Class</option>
+                                    <option value="high">High Class</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-8 text-right">
+                            <button type="submit" class="transform rounded-lg bg-green-600 px-6 py-2.5 font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                                Add Customer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- =========== PAGE: EXPENSES (List & Form) =========== -->
+                <div id="expenses-page" class="page-content hidden">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6">Expenses</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Left: Add Expense Form -->
+                        <div class="lg:col-span-1">
+                            <form id="add-expense-form" class="rounded-lg bg-white p-6 shadow-lg">
+                                <h2 class="mb-6 border-b border-gray-200 pb-3 text-2xl font-semibold text-gray-800">Add New Expense</h2>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label for="expense-desc" class="block text-sm font-medium text-gray-700">Description</label>
+                                        <input type="text" id="expense-desc" required placeholder="e.g., Shop Rent" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
+                                    </div>
+                                    <div>
+                                        <label for="expense-amount" class="block text-sm font-medium text-gray-700">Amount (₹)</label>
+                                        <input type="number" id="expense-amount" required min="0" placeholder="e.g., 5000" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
+                                    </div>
+                                    <div class="text-right pt-2">
+                                        <button type="submit" class="transform rounded-lg bg-green-600 px-6 py-2.5 font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                                            Add Expense
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- Right: Expenses List -->
+                        <div class="lg:col-span-2">
+                            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                                <table class="w-full">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                            <th class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                                            <th class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                            <th class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="expenses-table" class="divide-y divide-gray-200">
+                                        <!-- Expenses load here -->
+                                    </tbody>
+                                </table>
+                                <div id="expenses-loading" class="p-4 text-center text-gray-500">Loading expenses...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- =========== PAGE: SHARE (QR Codes) =========== -->
+                <div id="share-page" class="page-content hidden">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-6">Share Page</h1>
+                    <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+                        <div class="rounded-lg bg-white p-6 text-center shadow-lg">
+                            <h2 class="mb-4 text-2xl font-semibold text-green-800">Your Social Links</h2>
+                            <p class="mb-4 text-gray-600">Scan for WhatsApp, Call, & Insta.</p>
+                            <div id="qrcode-container" class="mx-auto flex h-64 w-64 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-gray-500">
+                                Generating...
+                            </div>
+                            <div class="mt-4 flex items-center justify-center space-x-3">
+                                <button id="print-qr-btn" class="transform rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white shadow-md transition hover:-translate-y-0.5 hover:bg-blue-700">
+                                    Print QR
+                                </button>
+                                <button id="copy-link-btn" class="rounded-lg bg-gray-100 px-5 py-2 text-sm font-medium text-gray-800 hover:bg-gray-200">
+                                    Copy Link
+                                </button>
+                            </div>
+                            <div class="mt-4">
+                                <p class="text-sm font-medium text-gray-700">Your unique social link:</p>
+                                <input id="shareable-link" type="text" readonly class="w-full rounded-md border-none bg-gray-100 p-2 text-center text-sm text-gray-600" value="Loading..." />
+                            </div>
+                        </div>
+                        
+                        <div class="rounded-lg bg-white p-6 text-center shadow-lg">
+                            <h2 class="mb-4 text-2xl font-semibold text-green-800">Your Public Collection</h2>
+                            <p class="mb-4 text-gray-600">Link for customers to browse your catalog.</p>
+                            <div id="collection-qrcode-container" class="mx-auto flex h-64 w-64 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-gray-500">
+                                Generating...
+                            </div>
+                            <div class="mt-4 flex items-center justify-center space-x-3">
+                                <button id="print-collection-qr-btn" class="transform rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white shadow-md transition hover:-translate-y-0.5 hover:bg-blue-700">
+                                    Print QR
+                                </button>
+                                <button id="copy-collection-link-btn" class="rounded-lg bg-gray-100 px-5 py-2 text-sm font-medium text-gray-800 hover:bg-gray-200">
+                                    Copy Link
+                                </button>
+                            </div>
+                            <div class="mt-4">
+                                <p class="text-sm font-medium text-gray-700">Your public collection link:</p>
+                                <input id="collection-link" type="text" readonly class="w-full rounded-md border-none bg-gray-100 p-2 text-center text-sm text-gray-600" value="https://vinodbhaiya.onrender.com/collection.html" />
+                            </div>
+                        </div>
+                        
+                        <div class="rounded-lg bg-white p-6 shadow-lg lg:col-span-1">
+                            <h2 class="mb-6 border-b border-gray-200 pb-3 text-2xl font-semibold text-green-800">Configure Links</h2>
+                            <form id="share-settings-form" class="space-y-6">
+                                <div>
+                                    <label for="whatsapp-url" class="block text-sm font-medium text-gray-700">WhatsApp Link</label>
+                                    <input type="url" id="whatsapp-url" placeholder="https://wa.me/91..." required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
+                                </div>
+                                <div>
+                                    <label for="phone-number" class="block text-sm font-medium text-gray-700">Phone Number (for Calls)</label>
+                                    <input type="text" id="phone-number" placeholder="10-digit number" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
+                                </div>
+                                <div>
+                                    <label for="instagram-url" class="block text-sm font-medium text-gray-700">Instagram Link</label>
+                                    <input type="url" id="instagram-url" placeholder="https://instagram.com/..." required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
+                                </div>
+                                <div class="text-right">
+                                    <button type="submit" class="transform rounded-lg bg-green-500 px-6 py-2.5 font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                                        Save Links
+                                    </button>
+                                </div>
+                                <p id="save-links-success" class="hidden text-center font-medium text-green-600">Links saved successfully!</p>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
         </div>
-        
+    </div>
+    
+    <!-- Mobile Fallback -->
+    <div id="mobile-fallback" class="lg:hidden flex h-screen w-full flex-col items-center justify-center bg-gray-900 p-6 text-center text-white">
+        <svg class="h-20 w-20 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+        <h2 class="mt-6 text-3xl font-bold">Dashboard Best on Desktop</h2>
+        <p class="mt-4 text-lg text-gray-300">This business management dashboard is designed for a larger screen. Please log in on a desktop, laptop, or tablet for the best experience.</p>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-10 right-10 z-50 hidden transform rounded-lg bg-gray-900 px-5 py-3 text-white shadow-lg transition-all">
+        <span id="toast-message"></span>
     </div>
 
     <script type="module">
         // --- 1. SUPABASE & APP STATE ---
         const SUPABASE_URL = 'https://axjetoaqrybsfohqhtll.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4amV0b2Fxcnlic2ZvaHFodGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxNzUwMjksImV4cCI6MjA3ODc1MTAyOX0.Q5C5LAANqBn2rD-VJtG-CxUQ9aupHzgt1OSMNClI8x4';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4amV0b2Fxcnlic2ZvaHFodGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxNzUwMjksImV4cCI6MjA3ODc1MTAyOX0.Q5C5LAANqBn2rD-VJtG-CxUQ9aupHzgt1OSMNClI8x4';
         const IMAGE_BUCKET = 'jersey-images';
 
         let supabase;
         let user = null;
+        let mainChart = null;
         
+        // This holds the master list of inventory for the POS
+        let posInventoryCache = [];
+        // This holds the items for the current sale
+        let posCart = [];
+
         const { createClient } = window.supabase;
         supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // --- UPDATED COLORS ---
-        const categoryClasses = {
-            high: "bg-red-100 text-red-800",
-            mid: "bg-yellow-100 text-yellow-800",
-            regular: "bg-blue-100 text-blue-800" // Changed from indigo
-        };
-        const categoryNames = {
-            high: "High Class",
-            mid: "Middle Class",
-            regular: "Regular"
-        };
-
-        // DOM Elements
+        // --- DOM Elements ---
         const loadingSpinner = document.getElementById('loading-spinner');
         const loadingText = document.getElementById('loading-text');
         const appView = document.getElementById('app-view');
-        const shareView = document.getElementById('share-view');
+        const mobileFallback = document.getElementById('mobile-fallback');
         const userIdDisplay = document.getElementById('user-id-display');
-        const inventoryList = document.getElementById('inventory-list');
-        const customerList = document.getElementById('customer-list');
-        const inventoryLoading = document.getElementById('inventory-loading');
-        const customersLoading = document.getElementById('customers-loading');
-        const addStockBtn = document.getElementById('add-stock-btn');
-
+        const allPages = document.querySelectorAll('.page-content');
+        const allSidebarLinks = document.querySelectorAll('.sidebar-link');
+        
         // --- 2. AUTHENTICATION & ROUTING ---
 
         function handleRouting() {
-            const hash = window.location.hash;
-            loadingSpinner.style.display = 'none';
-            appView.style.display = 'none';
-            shareView.style.display = 'none';
+            // This dashboard is not usable on mobile
+            if (window.innerWidth < 1024) {
+                appView.style.display = 'none';
+                mobileFallback.style.display = 'flex';
+                loadingSpinner.style.display = 'none';
+                return;
+            }
+            appView.style.display = 'flex';
+            mobileFallback.style.display = 'none';
 
-            if (hash.startsWith('#share/')) {
-                shareView.style.display = 'flex';
-                loadSharePage(hash);
-            } else {
+            // No hash, check session
+            if (!window.location.hash) {
                 loadingSpinner.style.display = 'flex';
                 loadingText.textContent = 'Connecting to session...';
                 checkUserSession();
+            } else {
+                // We have a hash, show the requested page
+                showPage(window.location.hash.replace('#', ''));
             }
         }
 
@@ -349,45 +569,7 @@
                 window.location.reload();
             }
         }
-
-        function loadSharePage(hash) {
-            const statusEl = document.getElementById('share-page-status');
-            const linksEl = document.getElementById('share-page-links');
-            try {
-                const params = new URLSearchParams(hash.substring(hash.indexOf('?') + 1));
-                const whatsappUrl = params.get('whatsapp');
-                const instaUrl = params.get('insta');
-                const phoneNum = params.get('phone'); // <-- ADDED
-
-                if (whatsappUrl && instaUrl && phoneNum) { // <-- UPDATED
-                    document.getElementById('whatsapp-link').href = decodeURIComponent(whatsappUrl);
-                    document.getElementById('instagram-link').href = decodeURIComponent(instaUrl);
-                    // --- NEW: Populate Call Link ---
-                    const callLink = document.getElementById('call-link');
-                    // Add +91 prefix for a 10-digit number
-                    const tel = phoneNum.length === 10 ? `+91${phoneNum}` : phoneNum;
-                    callLink.href = `tel:${decodeURIComponent(tel)}`;
-                    // --- END NEW ---
-
-                    statusEl.style.display = 'none';
-                    linksEl.style.display = 'block';
-                } else {
-                    showSharePageError("Contact links not found in URL.");
-                }
-            } catch (error) {
-                console.error("Error loading share page:", error);
-                showSharePageError("Could not load contact information.");
-            }
-        }
         
-        function showSharePageError(message) {
-            document.getElementById('share-page-status').style.display = 'none';
-            document.getElementById('share-page-links').style.display = 'none';
-            const errorEl = document.getElementById('share-page-error');
-            errorEl.textContent = message;
-            errorEl.style.display = 'block';
-        }
-
         async function loadMainApp() {
             if (!user) {
                 console.error("No user found. Cannot load app.");
@@ -395,134 +577,567 @@
                 return;
             }
             
-            shareView.style.display = 'none';
             userIdDisplay.textContent = `User ID: ${user.id.substring(0, 8)}...`;
             
             attachMainAppListeners();
             
-            await Promise.all([
-                loadInventory(),
-                loadCustomers(),
-                loadShareSettings()
-            ]);
+            // Set default route to dashboard
+            window.location.hash = 'dashboard';
+            await showPage('dashboard');
             
-            appView.style.display = 'block';
             loadingSpinner.style.display = 'none';
-            showTab('inventory');
         }
         
-        // --- 3. MAIN APP: TAB NAVIGATION ---
+        // --- 3. MAIN APP: PAGE NAVIGATION ---
 
-        const navTabs = document.querySelectorAll('.nav-tab');
-        const tabContents = document.querySelectorAll('.tab-content');
-
-        function showTab(tabName) {
-            navTabs.forEach(tab => {
-                const isTarget = tab.id === `nav-${tabName}`;
-                tab.classList.toggle('active-tab', isTarget);
-                tab.classList.toggle('inactive-tab', !isTarget);
-                tab.classList.toggle('text-green-600', isTarget); // Updated color
-                tab.classList.toggle('border-green-600', isTarget); // Updated color
-                tab.classList.toggle('text-gray-500', !isTarget);
-                tab.classList.toggle('hover:text-gray-700', !isTarget);
-                tab.classList.toggle('border-transparent', !isTarget);
+        async function showPage(pageName) {
+            if (!user && pageName !== 'share') {
+                // If user is somehow lost, re-auth
+                checkUserSession();
+                return;
+            }
+            
+            allPages.forEach(page => {
+                page.style.display = page.id === `${pageName}-page` ? 'block' : 'none';
             });
             
-            tabContents.forEach(content => {
-                content.style.display = content.id === `${tabName}-tab-content` ? 'block' : 'none';
+            allSidebarLinks.forEach(link => {
+                link.classList.toggle('sidebar-link-active', link.href.endsWith(`#${pageName}`));
             });
+            
+            // Load data for the specific page
+            switch(pageName) {
+                case 'dashboard':
+                    await loadDashboardStats();
+                    break;
+                case 'pos':
+                    await loadPosInventory();
+                    break;
+                case 'sales-history':
+                    await loadSalesHistory();
+                    break;
+                case 'reports':
+                    await loadReports();
+                    break;
+                case 'inventory':
+                    await loadInventoryList();
+                    break;
+                case 'customers':
+                    await loadCustomerList();
+                    break;
+                case 'expenses':
+                    await loadExpenses();
+                    break;
+                case 'share':
+                    await loadShareSettings();
+                    break;
+                // 'add-inventory' and 'add-customer' are just forms, no data load needed
+            }
         }
         
         // --- 4. MAIN APP: EVENT LISTENERS ---
         
         function attachMainAppListeners() {
-            document.getElementById('nav-inventory').addEventListener('click', () => showTab('inventory'));
-            document.getElementById('nav-customers').addEventListener('click', () => showTab('customers'));
-            document.getElementById('nav-share').addEventListener('click', () => showTab('share'));
+            window.addEventListener('hashchange', () => handleRouting());
+            document.getElementById('logout-btn').addEventListener('click', handleLogout);
             
+            // Form Submissions
             document.getElementById('add-inventory-form').addEventListener('submit', handleAddInventory);
             document.getElementById('add-customer-form').addEventListener('submit', handleAddCustomer);
+            document.getElementById('add-expense-form').addEventListener('submit', handleAddExpense);
             document.getElementById('share-settings-form').addEventListener('submit', handleSaveShareLinks);
-            
-            document.getElementById('copy-link-btn').addEventListener('click', copyShareLink);
-            document.getElementById('print-qr-btn').addEventListener('click', handlePrintQR);
-            document.getElementById('logout-btn').addEventListener('click', handleLogout);
+            document.getElementById('record-sale-btn').addEventListener('click', handleRecordSale);
+
+            // POS Search
+            document.getElementById('pos-search').addEventListener('input', (e) => renderPosInventory(e.target.value));
+
+            // Share Page Buttons
+            document.getElementById('copy-link-btn').addEventListener('click', () => copyShareLink('shareable-link'));
+            document.getElementById('print-qr-btn').addEventListener('click', () => handlePrintQR('qrcode-container', 'Social Links'));
+            document.getElementById('copy-collection-link-btn').addEventListener('click', () => copyShareLink('collection-link'));
+            document.getElementById('print-collection-qr-btn').addEventListener('click', () => handlePrintQR('collection-qrcode-container', 'Public Collection'));
         }
 
-        // --- 5. MAIN APP: INVENTORY CRUD (SUPABASE + STORAGE) ---
+        // --- 5. PAGE: DASHBOARD (STATS & CHART) ---
 
-        function renderInventory(inventory) {
-            inventoryLoading.style.display = 'none';
+        async function loadDashboardStats() {
+            document.getElementById('dashboard-stats').style.display = 'none';
+            document.getElementById('dashboard-loading').style.display = 'block';
 
-            if (!inventory || inventory.length === 0) {
-                inventoryList.innerHTML = '<p class="text-gray-500 col-span-full">No jerseys in stock. Add one using the form above.</p>';
+            const { data: sales, error: salesError } = await supabase
+                .from('sales')
+                .select('total_amount, total_profit, created_at')
+                .eq('user_id', user.id);
+                
+            const { data: expenses, error: expensesError } = await supabase
+                .from('expenses')
+                .select('amount, created_at')
+                .eq('user_id', user.id);
+
+            if (salesError || expensesError) {
+                console.error("Error fetching stats:", salesError || expensesError);
+                showToast('Error loading dashboard stats.', 'error');
+                return;
+            }
+
+            const totalRevenue = sales.reduce((acc, sale) => acc + parseFloat(sale.total_amount), 0);
+            const totalProfit = sales.reduce((acc, sale) => acc + parseFloat(sale.total_profit), 0);
+            const totalExpenses = expenses.reduce((acc, exp) => acc + parseFloat(exp.amount), 0);
+            const netIncome = totalProfit - totalExpenses;
+
+            document.getElementById('stat-revenue').textContent = `₹${totalRevenue.toFixed(2)}`;
+            document.getElementById('stat-expenses').textContent = `₹${totalExpenses.toFixed(2)}`;
+            document.getElementById('stat-profit').textContent = `₹${totalProfit.toFixed(2)}`;
+            document.getElementById('stat-net-income').textContent = `₹${netIncome.toFixed(2)}`;
+
+            document.getElementById('dashboard-stats').style.display = 'grid';
+            document.getElementById('dashboard-loading').style.display = 'none';
+            
+            // --- Chart.js Logic ---
+            const chartCtx = document.getElementById('main-chart').getContext('2d');
+            const { labels, salesData, expensesData } = processChartData(sales, expenses);
+
+            if (mainChart) {
+                mainChart.destroy();
+            }
+            mainChart = new Chart(chartCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Sales Revenue',
+                            data: salesData,
+                            borderColor: 'rgb(22, 163, 74)',
+                            backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Expenses',
+                            data: expensesData,
+                            borderColor: 'rgb(239, 68, 68)',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: (value) => `₹${value}`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function processChartData(sales, expenses, days = 30) {
+            const labels = [];
+            const salesMap = new Map();
+            const expensesMap = new Map();
+            const today = new Date();
+
+            for (let i = days - 1; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(today.getDate() - i);
+                const dateString = date.toISOString().split('T')[0];
+                labels.push(date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }));
+                salesMap.set(dateString, 0);
+                expensesMap.set(dateString, 0);
+            }
+
+            sales.forEach(sale => {
+                const dateString = new Date(sale.created_at).toISOString().split('T')[0];
+                if (salesMap.has(dateString)) {
+                    salesMap.set(dateString, salesMap.get(dateString) + parseFloat(sale.total_amount));
+                }
+            });
+
+            expenses.forEach(expense => {
+                const dateString = new Date(expense.created_at).toISOString().split('T')[0];
+                if (expensesMap.has(dateString)) {
+                    expensesMap.set(dateString, expensesMap.get(dateString) + parseFloat(expense.amount));
+                }
+            });
+
+            return {
+                labels,
+                salesData: Array.from(salesMap.values()),
+                expensesData: Array.from(expensesMap.values())
+            };
+        }
+
+        // --- 6. PAGE: POINT OF SALE (POS) ---
+        
+        async function loadPosInventory() {
+            // Load from cache if available
+            if (posInventoryCache.length > 0) {
+                renderPosInventory();
                 return;
             }
             
-            inventoryList.innerHTML = '';
-            inventory.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            // Fetch all inventory
+            const { data, error } = await supabase
+                .from('inventory')
+                .select('id, name, size, stock, price, cost')
+                .eq('user_id', user.id);
             
-            inventory.forEach((item) => {
+            if (error) {
+                showToast('Error loading inventory for POS.', 'error');
+                return;
+            }
+            posInventoryCache = data;
+            renderPosInventory();
+        }
+        
+        function renderPosInventory(filter = '') {
+            const listEl = document.getElementById('pos-inventory-list');
+            listEl.innerHTML = '';
+            
+            const lowerFilter = filter.toLowerCase();
+            const filtered = posInventoryCache.filter(item => 
+                item.name.toLowerCase().includes(lowerFilter) && item.stock > 0
+            );
+            
+            if (filtered.length === 0) {
+                listEl.innerHTML = `<p class="col-span-full text-gray-500 text-center">No products found${filter ? ' matching "' + filter + '"' : ' or all are out of stock'}.</p>`;
+                return;
+            }
+            
+            filtered.forEach(item => {
+                const isSelected = posCart.find(cartItem => cartItem.id === item.id);
                 const itemEl = document.createElement('div');
-                itemEl.className = 'flex flex-col justify-between rounded-lg bg-white shadow-lg overflow-hidden';
+                itemEl.className = `p-3 bg-white rounded-lg border shadow-sm cursor-pointer ${isSelected ? 'pos-item-selected' : ''}`;
+                itemEl.innerHTML = `
+                    <p class="font-semibold text-gray-800">${item.name}</p>
+                    <p class="text-sm text-gray-500">${item.size}</p>
+                    <p class="text-sm font-medium text-green-600">₹${item.price}</p>
+                    <p class="text-xs text-gray-400">Stock: ${item.stock}</p>
+                `;
+                itemEl.addEventListener('click', () => togglePosCart(item));
+                listEl.appendChild(itemEl);
+            });
+        }
+        
+        function togglePosCart(item) {
+            const cartIndex = posCart.findIndex(cartItem => cartItem.id === item.id);
+            
+            if (cartIndex > -1) {
+                // Remove from cart
+                posCart.splice(cartIndex, 1);
+            } else {
+                // Add to cart, with quantity 1
+                if(item.stock > 0) {
+                    posCart.push({ ...item, quantity: 1 });
+                } else {
+                    showToast('This item is out of stock.', 'error');
+                }
+            }
+            renderPosInventory(document.getElementById('pos-search').value);
+            renderPosCart();
+        }
+        
+        function renderPosCart() {
+            const cartEl = document.getElementById('pos-cart');
+            const emptyMsg = document.getElementById('pos-cart-empty');
+            const totalEl = document.getElementById('pos-cart-total');
+            const recordBtn = document.getElementById('record-sale-btn');
+            
+            cartEl.innerHTML = '';
+            
+            if (posCart.length === 0) {
+                emptyMsg.style.display = 'block';
+                totalEl.textContent = '₹0.00';
+                recordBtn.disabled = true;
+                return;
+            }
+            
+            emptyMsg.style.display = 'none';
+            let totalAmount = 0;
+            
+            posCart.forEach(item => {
+                const itemAmount = parseFloat(item.price) * item.quantity;
+                totalAmount += itemAmount;
+                
+                const cartItemEl = document.createElement('div');
+                cartItemEl.className = 'flex items-center justify-between py-2 border-b';
+                cartItemEl.innerHTML = `
+                    <div class="flex-1">
+                        <p class="font-medium text-gray-800">${item.name} (${item.size})</p>
+                        <p class="text-sm text-gray-500">₹${item.price} x ${item.quantity}</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <input type="number" min="1" max="${item.stock}" value="${item.quantity}" data-id="${item.id}" class="pos-quantity-input w-16 rounded-md border-gray-300 text-center shadow-sm">
+                        <button data-id="${item.id}" class="pos-remove-item rounded-full p-1 text-red-500 hover:bg-red-100">
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+                        </button>
+                    </div>
+                `;
+                cartEl.appendChild(cartItemEl);
+            });
+            
+            totalEl.textContent = `₹${totalAmount.toFixed(2)}`;
+            recordBtn.disabled = false;
+            
+            // Attach listeners for quantity change and remove
+            document.querySelectorAll('.pos-quantity-input').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const id = e.target.dataset.id;
+                    let newQty = parseInt(e.target.value);
+                    const item = posCart.find(cartItem => cartItem.id === id);
+                    if (newQty > item.stock) {
+                        newQty = item.stock;
+                        showToast(`Only ${item.stock} in stock.`, 'error');
+                    }
+                    if (newQty < 1) newQty = 1;
+                    item.quantity = newQty;
+                    renderPosCart();
+                });
+            });
+            
+            document.querySelectorAll('.pos-remove-item').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.currentTarget.dataset.id;
+                    posCart = posCart.filter(item => item.id !== id);
+                    renderPosInventory(document.getElementById('pos-search').value);
+                    renderPosCart();
+                });
+            });
+        }
+        
+        async function handleRecordSale() {
+            const recordBtn = document.getElementById('record-sale-btn');
+            recordBtn.disabled = true;
+            recordBtn.textContent = 'Processing...';
+            
+            let totalAmount = 0;
+            let totalCost = 0;
+            
+            posCart.forEach(item => {
+                totalAmount += parseFloat(item.price) * item.quantity;
+                totalCost += (parseFloat(item.cost) || 0) * item.quantity;
+            });
+            
+            const totalProfit = totalAmount - totalCost;
+            const customerName = document.getElementById('pos-customer').value || 'Walk-in Customer';
+            
+            try {
+                // 1. Create the main Sale record
+                const { data: sale, error: saleError } = await supabase
+                    .from('sales')
+                    .insert({
+                        user_id: user.id,
+                        customer_name: customerName,
+                        total_amount: totalAmount,
+                        total_cost: totalCost,
+                        total_profit: totalProfit
+                    })
+                    .select()
+                    .single();
+                
+                if (saleError) throw saleError;
+                
+                // 2. Create the Sales Items records
+                const saleItems = posCart.map(item => ({
+                    sale_id: sale.id,
+                    inventory_id: item.id,
+                    user_id: user.id,
+                    quantity: item.quantity,
+                    sold_price: item.price,
+                    sold_cost: item.cost,
+                    item_name: `${item.name} (${item.size})`
+                }));
+                
+                const { error: itemsError } = await supabase.from('sales_items').insert(saleItems);
+                if (itemsError) throw itemsError;
+                
+                // 3. Update stock for each item
+                const stockUpdates = posCart.map(item => {
+                    const newStock = item.stock - item.quantity;
+                    return supabase
+                        .from('inventory')
+                        .update({ stock: newStock })
+                        .eq('id', item.id);
+                });
+                
+                await Promise.all(stockUpdates);
+                
+                // 4. Success: Clear cart and refresh
+                showToast('Sale recorded successfully!', 'success');
+                posCart = [];
+                posInventoryCache = []; // Force refresh of inventory cache
+                document.getElementById('pos-customer').value = '';
+                renderPosCart();
+                await loadPosInventory();
+                
+            } catch (error) {
+                console.error("Error recording sale:", error);
+                showToast(`Error: ${error.message}`, 'error');
+            } finally {
+                recordBtn.disabled = false;
+                recordBtn.textContent = 'Record Sale';
+            }
+        }
+        
+        // --- 7. PAGE: SALES HISTORY ---
+        
+        async function loadSalesHistory() {
+            const tableBody = document.getElementById('sales-history-table');
+            const loadingMsg = document.getElementById('sales-history-loading');
+            loadingMsg.style.display = 'table-row';
+            tableBody.innerHTML = '';
+            
+            const { data, error } = await supabase
+                .from('sales')
+                .select('*, sales_items(quantity, item_name)')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false });
+            
+            if (error) {
+                showToast('Error loading sales history.', 'error');
+                return;
+            }
+            
+            loadingMsg.style.display = 'none';
+            if (data.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">No sales recorded yet.</td></tr>`;
+                return;
+            }
+            
+            data.forEach(sale => {
+                const date = new Date(sale.created_at).toLocaleDateString('en-IN');
+                const itemsCount = sale.sales_items.reduce((acc, item) => acc + item.quantity, 0);
+                const firstItem = sale.sales_items[0]?.item_name || 'N/A';
+                const itemsDesc = itemsCount > 1 ? `${firstItem} + ${itemsCount - 1} more` : firstItem;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-4 whitespace-nowrap text-sm text-gray-500">${date}</td>
+                    <td class="p-4 whitespace-nowrap text-sm font-medium text-gray-900">${sale.customer_name}</td>
+                    <td class="p-4 whitespace-nowrap text-sm text-gray-500">${itemsDesc}</td>
+                    <td class="p-4 whitespace-nowrap text-sm text-gray-900">₹${sale.total_amount.toFixed(2)}</td>
+                    <td class="p-4 whitespace-nowrap text-sm font-medium text-green-600">₹${sale.total_profit.toFixed(2)}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // --- 8. PAGE: REPORTS ---
+        
+        async function loadReports() {
+            const tableBody = document.getElementById('top-selling-table');
+            const loadingMsg = document.getElementById('reports-loading');
+            loadingMsg.style.display = 'table-row';
+            tableBody.innerHTML = '';
+            
+            const { data, error } = await supabase
+                .from('sales_items')
+                .select('item_name, quantity')
+                .eq('user_id', user.id);
+            
+            if (error) {
+                showToast('Error loading reports.', 'error');
+                return;
+            }
+            
+            if (data.length === 0) {
+                loadingMsg.style.display = 'none';
+                tableBody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-500">No sales data to report.</td></tr>`;
+                return;
+            }
+            
+            // Group by item name in JS
+            const productMap = new Map();
+            data.forEach(item => {
+                const count = productMap.get(item.item_name) || 0;
+                productMap.set(item.item_name, count + item.quantity);
+            });
+            
+            // Sort by most sold
+            const sortedProducts = [...productMap.entries()].sort((a, b) => b[1] - a[1]);
+            
+            loadingMsg.style.display = 'none';
+            sortedProducts.forEach(([name, count], index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-4 whitespace-nowrap text-sm font-medium text-gray-900">${index + 1}</td>
+                    <td class="p-4 whitespace-nowrap text-sm text-gray-800">${name}</td>
+                    <td class="p-4 whitespace-nowrap text-sm text-gray-500">${count}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // --- 9. PAGE: INVENTORY ---
+        
+        async function loadInventoryList() {
+            const listEl = document.getElementById('inventory-list-cards');
+            const loadingMsg = document.getElementById('inventory-list-loading');
+            loadingMsg.style.display = 'block';
+            listEl.innerHTML = '';
+
+            const { data, error } = await supabase
+                .from('inventory')
+                .select('*')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                showToast('Error loading inventory.', 'error');
+                return;
+            }
+            
+            loadingMsg.style.display = 'none';
+            if (data.length === 0) {
+                listEl.innerHTML = `<p class="col-span-full text-gray-500">No inventory found. Go to "Add Inventory" to add a new item.</p>`;
+                return;
+            }
+            
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-lg shadow-lg overflow-hidden flex flex-col';
                 
                 const placeholder = 'https://placehold.co/400x400/e2e8f0/94a3b8?text=No+Image';
                 let imageUrl = placeholder;
                 if (item.image_path) {
-                    const { data } = supabase.storage.from(IMAGE_BUCKET).getPublicUrl(item.image_path);
-                    if (data) imageUrl = data.publicUrl;
+                    const { data: urlData } = supabase.storage.from(IMAGE_BUCKET).getPublicUrl(item.image_path);
+                    if (urlData) imageUrl = urlData.publicUrl;
                 }
-
-                itemEl.innerHTML = `
-                    <div>
-                        <img src="${imageUrl}" alt="${item.name}" class="h-56 w-full object-cover" onerror="this.src='${placeholder}'">
-                        <div class="p-5 space-y-3">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-xl font-bold text-green-900">${item.name}</h3>
-                                <span class="rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-800">
-                                    Size: ${item.size}
-                                </span>
-                            </div>
-                            <p class="text-lg font-semibold text-green-700">${item.price ? `₹${parseFloat(item.price).toFixed(2)}` : 'N/A'}</p>
-                            
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-700">Stock:</span>
-                                <div class="flex items-center space-x-2">
-                                    <button data-id="${item.id}" data-stock="${item.stock}" class="stock-adjust stock-decrease rounded-full bg-red-100 p-1 text-red-700 hover:bg-red-200">-</button>
-                                    <span class="w-10 text-center text-lg font-medium">${item.stock}</span>
-                                    <button data-id="${item.id}" data-stock="${item.stock}" class="stock-adjust stock-increase rounded-full bg-green-100 p-1 text-green-700 hover:bg-green-200">+</button>
-                                </div>
-                            </div>
+                
+                const profit = (parseFloat(item.price) || 0) - (parseFloat(item.cost) || 0);
+                
+                card.innerHTML = `
+                    <img src="${imageUrl}" alt="${item.name}" class="h-56 w-full object-cover" onerror="this.src='${placeholder}'">
+                    <div class="p-5 space-y-3 flex-1 flex flex-col">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xl font-bold text-gray-900">${item.name}</h3>
+                            <span class="rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-800">
+                                Size: ${item.size}
+                            </span>
+                        </div>
+                        <div class="flex-1 space-y-2">
+                            <p class="text-sm text-gray-600">Stock: <span class="font-bold text-lg text-gray-800">${item.stock}</span></p>
+                            <p class="text-sm text-gray-600">Cost: <span class="font-medium text-gray-800">₹${item.cost || 0}</span></p>
+                            <p class="text-sm text-gray-600">Price: <span class="font-medium text-gray-800">₹${item.price || 0}</span></p>
+                            <p class="text-sm text-gray-600">Profit: <span class="font-bold text-green-700">₹${profit.toFixed(2)}</span></p>
                         </div>
                     </div>
-                    
-                    <div class="p-4 bg-gray-50">
-                        <button data-id="${item.id}" data-image-path="${item.image_path || ''}" class="delete-inventory-btn w-full rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">
-                            Delete
-                        </button>
+                    <div class="p-4 bg-gray-50 grid grid-cols-2 gap-2">
+                        <button data-id="${item.id}" class="edit-inventory-btn w-full rounded-lg bg-yellow-500 px-4 py-2 text-sm font-medium text-white hover:bg-yellow-600">Edit</button>
+                        <button data-id="${item.id}" data-image-path="${item.image_path || ''}" class="delete-inventory-btn w-full rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">Delete</button>
                     </div>
                 `;
-                inventoryList.appendChild(itemEl);
+                listEl.appendChild(card);
             });
             
-            document.querySelectorAll('.stock-adjust').forEach(btn => btn.addEventListener('click', handleStockAdjust));
             document.querySelectorAll('.delete-inventory-btn').forEach(btn => btn.addEventListener('click', handleDeleteInventory));
-        }
-
-        async function loadInventory() {
-            inventoryLoading.style.display = 'block';
-            const { data, error } = await supabase
-                .from('inventory')
-                .select('*')
-                .eq('user_id', user.id); 
-
-            if (error) {
-                console.error("Error fetching inventory:", error);
-                showToast(`Error fetching inventory: ${error.message}`, 'error');
-                inventoryLoading.style.display = 'none';
-                return;
-            }
-            renderInventory(data);
+            // Add listeners for 'edit' when functionality is built
         }
         
         async function handleAddInventory(e) {
@@ -531,8 +1146,9 @@
             const file = form['jersey-image'].files[0];
             let imagePath = null;
             
-            addStockBtn.disabled = true;
-            addStockBtn.textContent = 'Uploading...';
+            const addBtn = document.getElementById('add-stock-btn');
+            addBtn.disabled = true;
+            addBtn.textContent = 'Uploading...';
 
             try {
                 if (file) {
@@ -551,6 +1167,7 @@
                     size: form['jersey-size'].value,
                     stock: parseInt(form['jersey-stock'].value),
                     price: parseFloat(form['jersey-price'].value) || 0,
+                    cost: parseFloat(form['jersey-cost'].value) || 0,
                     image_path: imagePath,
                 };
             
@@ -559,7 +1176,7 @@
                 
                 form.reset();
                 showToast('Jersey added to stock!', 'success');
-                await loadInventory();
+                window.location.hash = 'inventory'; // Go to inventory list
             } catch (error) {
                 console.error("Error adding inventory:", error);
                 showToast(`Error: ${error.message}`, 'error');
@@ -567,31 +1184,8 @@
                     await supabase.storage.from(IMAGE_BUCKET).remove([imagePath]);
                 }
             } finally {
-                addStockBtn.disabled = false;
-                addStockBtn.textContent = 'Add to Stock';
-            }
-        }
-        
-        async function handleStockAdjust(e) {
-            const id = e.target.dataset.id;
-            let stock = parseInt(e.target.dataset.stock);
-            
-            if (e.target.classList.contains('stock-increase')) {
-                stock++;
-            } else if (stock > 0) {
-                stock--;
-            }
-            
-            try {
-                const { error } = await supabase
-                    .from('inventory')
-                    .update({ stock: stock })
-                    .eq('id', id);
-                if (error) throw error;
-                await loadInventory();
-            } catch (error) {
-                console.error("Error updating stock:", error);
-                showToast(`Error: ${error.message}`, 'error');
+                addBtn.disabled = false;
+                addBtn.textContent = 'Add to Stock';
             }
         }
         
@@ -614,7 +1208,7 @@
                         if (storageError) console.warn("Could not delete image:", storageError.message);
                     }
                     showToast('Item deleted.', 'success');
-                    await loadInventory();
+                    await loadInventoryList(); // Reload this page
                 } catch (error) {
                     console.error("Error deleting item:", error);
                     showToast(`Error: ${error.message}`, 'error');
@@ -622,49 +1216,69 @@
             }
         }
         
-        // --- 6. MAIN APP: CUSTOMERS CRUD (SUPABASE + WHATSAPP) ---
+        // --- 10. PAGE: CUSTOMERS ---
+        
+        const categoryClasses = {
+            high: "bg-red-100 text-red-800",
+            mid: "bg-yellow-100 text-yellow-800",
+            regular: "bg-blue-100 text-blue-800"
+        };
+        const categoryNames = {
+            high: "High Class",
+            mid: "Middle Class",
+            regular: "Regular"
+        };
+        
+        async function loadCustomerList() {
+            const listEl = document.getElementById('customer-list-cards');
+            const loadingMsg = document.getElementById('customers-loading');
+            loadingMsg.style.display = 'block';
+            listEl.innerHTML = '';
+            
+            const { data, error } = await supabase
+                .from('customers')
+                .select('*')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false });
 
-        function renderCustomers(customers) {
-            customersLoading.style.display = 'none';
-
-            if (!customers || customers.length === 0) {
-                customerList.innerHTML = '<p class="text-gray-500 col-span-full">No customers found. Add one using the form above.</p>';
+            if (error) {
+                showToast('Error loading customers.', 'error');
                 return;
             }
             
-            customerList.innerHTML = '';
-            customers.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-            customers.forEach((customer) => {
+            loadingMsg.style.display = 'none';
+            if (data.length === 0) {
+                listEl.innerHTML = `<p class="col-span-full text-gray-500">No customers found. Go to "Add Customer" to add one.</p>`;
+                return;
+            }
+            
+            data.forEach(customer => {
                 const category = customer.category || 'regular';
                 const categoryClass = categoryClasses[category];
                 const categoryName = categoryNames[category];
                 const waLink = formatWhatsAppLink(customer.contact);
-
-                const customerEl = document.createElement('div');
-                customerEl.className = 'flex flex-col justify-between rounded-lg bg-white shadow-lg';
-                customerEl.innerHTML = `
-                    <div class="p-5 space-y-4">
-                        <div>
-                            <div class="flex items-start justify-between">
-                                <h3 class="text-xl font-bold text-green-900">${customer.name}</h3>
-                                <span class="ml-2 flex-shrink-0 rounded-full ${categoryClass} px-3 py-1 text-sm font-semibold">
-                                    ${categoryName}
-                                </span>
-                            </div>
-                            <p class="text-gray-600">${customer.contact || 'No contact info'}</p>
+                
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-lg shadow-lg flex flex-col';
+                card.innerHTML = `
+                    <div class="p-5 space-y-4 flex-1">
+                        <div class="flex items-start justify-between">
+                            <h3 class="text-xl font-bold text-gray-900">${customer.name}</h3>
+                            <span class="ml-2 flex-shrink-0 rounded-full ${categoryClass} px-3 py-1 text-sm font-semibold">
+                                ${categoryName}
+                            </span>
                         </div>
+                        <p class="text-gray-600">${customer.contact || 'No contact info'}</p>
                         
-                        <div class="space-y-2">
+                        <div>
                              <label for="cat-select-${customer.id}" class="text-sm font-medium text-gray-700">Change Category:</label>
-                             <select data-id="${customer.id}" id="cat-select-${customer.id}" class="customer-category-select w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
+                             <select data-id="${customer.id}" id="cat-select-${customer.id}" class="customer-category-select mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
                                 <option value="regular" ${category === 'regular' ? 'selected' : ''}>Regular</option>
                                 <option value="mid" ${category === 'mid' ? 'selected' : ''}>Middle Class</option>
                                 <option value="high" ${category === 'high' ? 'selected' : ''}>High Class</option>
                             </select>
                         </div>
                     </div>
-
                     <div class="grid grid-cols-2 gap-px bg-gray-50 rounded-b-lg overflow-hidden">
                         <a ${waLink ? `href="${waLink}" target="_blank"` : ''} 
                            class="flex items-center justify-center gap-2 bg-white p-3 text-sm font-medium text-green-600 ${!waLink ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-50'}">
@@ -677,7 +1291,7 @@
                         </button>
                     </div>
                 `;
-                customerList.appendChild(customerEl);
+                listEl.appendChild(card);
             });
             
             document.querySelectorAll('.customer-category-select').forEach(sel => sel.addEventListener('change', handleCategoryChange));
@@ -696,22 +1310,6 @@
             return null;
         }
 
-        async function loadCustomers() {
-            customersLoading.style.display = 'block';
-            const { data, error } = await supabase
-                .from('customers')
-                .select('*')
-                .eq('user_id', user.id);
-
-            if (error) {
-                console.error("Error fetching customers:", error);
-                showToast(`Error fetching customers: ${error.message}`, 'error');
-                customersLoading.style.display = 'none';
-                return;
-            }
-            renderCustomers(data);
-        }
-        
         async function handleAddCustomer(e) {
             e.preventDefault();
             const form = e.target;
@@ -727,7 +1325,7 @@
                 if (error) throw error;
                 form.reset();
                 showToast('Customer added!', 'success');
-                await loadCustomers();
+                window.location.hash = 'customers';
             } catch (error) {
                 console.error("Error adding customer:", error);
                 showToast(`Error: ${error.message}`, 'error');
@@ -744,7 +1342,7 @@
                     .eq('id', id);
                 if (error) throw error;
                 showToast('Category updated.', 'success');
-                await loadCustomers();
+                await loadCustomerList(); // Reload this page
             } catch (error) {
                 console.error("Error updating category:", error);
                 showToast(`Error: ${error.message}`, 'error');
@@ -752,7 +1350,7 @@
         }
         
         async function handleDeleteCustomer(e) {
-            const id = e.target.dataset.id;
+            const id = e.currentTarget.dataset.id;
             if (confirm('Are you sure you want to delete this customer?')) {
                 try {
                     const { error } = await supabase
@@ -761,15 +1359,97 @@
                         .eq('id', id);
                     if (error) throw error;
                     showToast('Customer deleted.', 'success');
-                    await loadCustomers();
+                    await loadCustomerList(); // Reload this page
                 } catch (error) {
                     console.error("Error deleting customer:", error);
                     showToast(`Error: ${error.message}`, 'error');
                 }
             }
         }
+        
+        // --- 11. PAGE: EXPENSES ---
+        
+        async function loadExpenses() {
+            const tableBody = document.getElementById('expenses-table');
+            const loadingMsg = document.getElementById('expenses-loading');
+            loadingMsg.style.display = 'table-row';
+            tableBody.innerHTML = '';
+            
+            const { data, error } = await supabase
+                .from('expenses')
+                .select('*')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false });
 
-        // --- 7. MAIN APP: SHARE PAGE SETTINGS (SUPABASE) ---
+            if (error) {
+                showToast('Error loading expenses.', 'error');
+                return;
+            }
+            
+            loadingMsg.style.display = 'none';
+            if (data.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500">No expenses recorded yet.</td></tr>`;
+                return;
+            }
+            
+            data.forEach(expense => {
+                const date = new Date(expense.created_at).toLocaleDateString('en-IN');
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-4 whitespace-nowrap text-sm text-gray-500">${date}</td>
+                    <td class="p-4 whitespace-nowrap text-sm font-medium text-gray-900">${expense.description}</td>
+                    <td class="p-4 whitespace-nowrap text-sm text-gray-900">₹${expense.amount.toFixed(2)}</td>
+                    <td class="p-4 whitespace-nowrap text-sm text-right">
+                        <button data-id="${expense.id}" class="delete-expense-btn text-red-500 hover:text-red-700">Delete</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            
+            document.querySelectorAll('.delete-expense-btn').forEach(btn => btn.addEventListener('click', handleDeleteExpense));
+        }
+        
+        async function handleAddExpense(e) {
+            e.preventDefault();
+            const form = e.target;
+            const expense = {
+                user_id: user.id,
+                description: form['expense-desc'].value,
+                amount: parseFloat(form['expense-amount'].value),
+            };
+            
+            try {
+                const { error } = await supabase.from('expenses').insert(expense);
+                if (error) throw error;
+                form.reset();
+                showToast('Expense added!', 'success');
+                await loadExpenses(); // Reload this page
+            } catch (error) {
+                console.error("Error adding expense:", error);
+                showToast(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function handleDeleteExpense(e) {
+            const id = e.currentTarget.dataset.id;
+            if (confirm('Are you sure you want to delete this expense?')) {
+                try {
+                    const { error } = await supabase
+                        .from('expenses')
+                        .delete()
+                        .eq('id', id);
+                    if (error) throw error;
+                    showToast('Expense deleted.', 'success');
+                    await loadExpenses(); // Reload this page
+                } catch (error) {
+                    console.error("Error deleting expense:", error);
+                    showToast(`Error: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        // --- 12. PAGE: SHARE ---
+        
         async function loadShareSettings() {
             const { data, error } = await supabase
                 .from('settings')
@@ -778,51 +1458,43 @@
                 .limit(1)
                 .single();
 
-            // --- MODIFICATION: Set default URLs ---
-            let whatsappUrl = 'https://wa.me/917793036608'; // Default
-            let instaUrl = 'https://www.instagram.com/ommensfashion?igsh=YWtrNnlhZmoycmpp'; // Default
-            let phoneNumber = '7793036608'; // <-- ADDED DEFAULT
+            let whatsappUrl = 'https://wa.me/917793036608';
+            let instaUrl = 'https://www.instagram.com/ommensfashion?igsh=YWtrNnlhZmoycmpp';
+            let phoneNumber = '7793036608';
 
             if (data) {
-                // Use saved data if it exists, otherwise fall back to the defaults
                 whatsappUrl = data.whatsapp || whatsappUrl;
                 instaUrl = data.instagram || instaUrl;
-                phoneNumber = data.phone || phoneNumber; // <-- ADDED
+                phoneNumber = data.phone || phoneNumber;
             } else if (error && error.code !== 'PGRST116') {
                 console.error("Error loading settings:", error);
-                showToast('Error loading share settings.', 'error');
             }
-            // --- END MODIFICATION ---
 
             document.getElementById('whatsapp-url').value = whatsappUrl;
             document.getElementById('instagram-url').value = instaUrl;
-            document.getElementById('phone-number').value = phoneNumber; // <-- ADDED
+            document.getElementById('phone-number').value = phoneNumber;
 
-            const baseUrl = `${window.location.origin}${window.location.pathname}`;
+            // --- Generate Social QR ---
+            const baseUrl = `${window.location.origin}${window.location.pathname}`.replace('admin_dashboard.html', '');
             const shareParams = new URLSearchParams();
             shareParams.set('whatsapp', whatsappUrl);
             shareParams.set('insta', instaUrl);
-            shareParams.set('phone', phoneNumber); // <-- ADDED
+            shareParams.set('phone', phoneNumber);
             
+            // This link format `#share/?...` is for the *old* app
+            // We'll keep it for now, but a separate file is better
             const shareLink = `${baseUrl}#share/?${shareParams.toString()}`;
-            
             document.getElementById('shareable-link').value = shareLink;
             
             const qrContainer = document.getElementById('qrcode-container');
             qrContainer.innerHTML = '';
+            new QRCode(qrContainer, { text: shareLink, width: 256, height: 256 });
             
-            if(whatsappUrl && instaUrl) {
-                new QRCode(qrContainer, {
-                    text: shareLink,
-                    width: 256,
-                    height: 256,
-                    colorDark : "#000000",
-                    colorLight : "#ffffff",
-                    correctLevel : QRCode.CorrectLevel.H
-                });
-            } else {
-                qrContainer.innerHTML = '<p class="p-4 text-center text-gray-600">Please enter and save both a WhatsApp and Instagram link to generate your QR code.</p>';
-            }
+            // --- Generate Collection QR ---
+            const collectionUrl = (document.getElementById('collection-link').value || 'https://vinodbhaiya.onrender.com/collection.html'); 
+            const collectionQrContainer = document.getElementById('collection-qrcode-container');
+            collectionQrContainer.innerHTML = '';
+            new QRCode(collectionQrContainer, { text: collectionUrl, width: 256, height: 256 });
         }
         
         async function handleSaveShareLinks(e) {
@@ -831,7 +1503,7 @@
                 user_id: user.id,
                 whatsapp: document.getElementById('whatsapp-url').value,
                 instagram: document.getElementById('instagram-url').value,
-                phone: document.getElementById('phone-number').value, // <-- ADDED
+                phone: document.getElementById('phone-number').value,
             };
             
             try {
@@ -851,62 +1523,47 @@
             }
         }
         
-        function copyShareLink() {
-            const linkInput = document.getElementById('shareable-link');
+        function copyShareLink(inputId) {
+            const linkInput = document.getElementById(inputId);
             linkInput.select();
             linkInput.setSelectionRange(0, 99999);
-            
             try {
                 document.execCommand('copy');
                 showToast('Link copied to clipboard!', 'success');
             } catch (err) {
-                console.error('Failed to copy link: ', err);
                 showToast('Failed to copy link.', 'error');
             }
         }
 
-        // --- NEW FUNCTION: Print QR ---
-        function handlePrintQR() {
-            const qrContainer = document.getElementById('qrcode-container');
+        function handlePrintQR(containerId, title) {
+            const qrContainer = document.getElementById(containerId);
             const qrImage = qrContainer.querySelector('img');
+            if (!qrImage) return;
 
-            if (!qrImage) {
-                showToast('QR Code not yet generated.', 'error');
-                return;
-            }
-
-            // Create a new window for printing
             const printWindow = window.open('', '_blank');
             printWindow.document.write('<html><head><title>Print QR Code</title>');
-            // --- UPDATED: More attractive print layout ---
             printWindow.document.write('<style>body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; text-align: center; margin-top: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; } img { width: 300px; height: 300px; margin-top: 20px; } h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0; } p { font-size: 1.25rem; color: #4A5568; margin-top: 10px; }</style>');
             printWindow.document.write('</head><body>');
-            printWindow.document.write('<h1>Ommen\'s Fashion</h1>');
-            printWindow.document.write('<p>Scan to connect with us!</p>');
+            printWindow.document.write(`<h1>Ommen's Fashion</h1>`);
+            printWindow.document.write(`<p>Scan for our ${title}</p>`);
             printWindow.document.write('<img src="' + qrImage.src + '">');
-            // --- END UPDATE ---
             printWindow.document.write('</body></html>');
             
             printWindow.document.close();
             printWindow.focus();
-            
-            // Use a slight delay to ensure the image loads
             setTimeout(() => {
                 printWindow.print();
                 printWindow.close();
             }, 500);
         }
 
-        // --- 8. (COLLECTION LOGIC REMOVED) ---
-
-        // --- 9. UTILITIES ---
+        // --- 13. UTILITIES ---
         
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toast-message');
             
             toastMessage.textContent = message;
-            // Updated toast colors for better theme consistency
             if (type === 'success') {
                 toast.className = 'fixed bottom-10 right-10 z-50 transform rounded-lg px-5 py-3 text-white shadow-lg bg-green-600';
             } else {
@@ -922,11 +1579,9 @@
             }, 3000);
         }
 
-        // --- 10. INITIALIZE APP ---
-        
+        // --- 14. INITIALIZE APP ---
         document.addEventListener('DOMContentLoaded', handleRouting);
-        window.addEventListener('hashchange', handleRouting);
-
+        window.addEventListener('resize', handleRouting); // Check for mobile
     </script>
 </body>
 </html>
