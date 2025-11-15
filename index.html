@@ -76,21 +76,15 @@
                 </a>
                 
                 <p class="mt-4 mb-1 px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Manage</p>
+                <!-- MERGED: Inventory and Add Inventory -->
                 <a href="#inventory" class="sidebar-link">
                     <svg class="h-6 w-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
                     Inventory
                 </a>
-                <a href="#add-inventory" class="sidebar-link">
-                    <svg class="h-6 w-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Add Inventory
-                </a>
+                <!-- MERGED: Customers and Add Customer -->
                 <a href="#customers" class="sidebar-link">
                     <svg class="h-6 w-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 016-6h6v1a6 6 0 01-6 6v-1zm6-3a3 3 0 100-6 3 3 0 000 6z"></path></svg>
                     Customers
-                </a>
-                <a href="#add-customer" class="sidebar-link">
-                    <svg class="h-6 w-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
-                    Add Customer
                 </a>
                 <a href="#expenses" class="sidebar-link">
                     <svg class="h-6 w-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 8h6m-4 4h4m2 0h-2m2 0h2M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -249,19 +243,18 @@
                     </div>
                 </div>
                 
-                <!-- =========== PAGE: INVENTORY (List) =========== -->
+                <!-- =========== PAGE: INVENTORY (List & Form) =========== -->
                 <div id="inventory-page" class="page-content hidden">
-                    <h1 class="text-3xl font-bold text-gray-800 mb-6">Inventory</h1>
-                    <div id="inventory-list-loading" class="text-center text-gray-500">Loading inventory...</div>
-                    <div id="inventory-list-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Inventory cards load here -->
+                    <div class="flex justify-between items-center mb-6">
+                        <h1 class="text-3xl font-bold text-gray-800">Inventory</h1>
+                        <button id="toggle-add-inventory-btn" class="transform rounded-lg bg-green-600 px-5 py-2 font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-green-700">
+                            Add New Jersey
+                        </button>
                     </div>
-                </div>
-                
-                <!-- =========== PAGE: ADD INVENTORY (Form) =========== -->
-                <div id="add-inventory-page" class="page-content hidden">
-                    <h1 class="text-3xl font-bold text-gray-800 mb-6">Add New Inventory</h1>
-                    <form id="add-inventory-form" class="max-w-3xl mx-auto rounded-lg bg-white p-6 shadow-lg">
+
+                    <!-- Add Inventory Form (Hidden by default) -->
+                    <form id="add-inventory-form" class="hidden max-w-3xl mx-auto rounded-lg bg-white p-6 shadow-lg mb-8">
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-6">Add New Jersey</h2>
                         <div class="space-y-6">
                             <div>
                                 <label for="jersey-name" class="block text-sm font-medium text-gray-700">Jersey Name</label>
@@ -299,27 +292,37 @@
                                 <input type="file" id="jersey-image" accept="image/png, image/jpeg, image/webp" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:cursor-pointer file:rounded-lg file:border-0 file:bg-green-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-green-700 hover:file:bg-green-100"/>
                             </div>
                         </div>
-                        <div class="mt-8 text-right">
+                        <div class="mt-8 flex justify-end gap-4">
+                            <button type="button" id="cancel-add-inventory-btn" class="rounded-lg bg-gray-200 px-6 py-2.5 font-semibold text-gray-800 hover:bg-gray-300">
+                                Cancel
+                            </button>
                             <button type="submit" id="add-stock-btn" class="transform rounded-lg bg-green-600 px-6 py-2.5 font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
                                 Add to Stock
                             </button>
                         </div>
                     </form>
-                </div>
-                
-                <!-- =========== PAGE: CUSTOMERS (List) =========== -->
-                <div id="customers-page" class="page-content hidden">
-                    <h1 class="text-3xl font-bold text-gray-800 mb-6">Customers</h1>
-                    <div id="customers-loading" class="text-center text-gray-500">Loading customers...</div>
-                    <div id="customer-list-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Customer cards load here -->
+                    
+                    <!-- Inventory List -->
+                    <div id="inventory-list-loading" class="text-center text-gray-500">Loading inventory...</div>
+                    <div id="inventory-list-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Inventory cards load here -->
                     </div>
                 </div>
                 
-                <!-- =========== PAGE: ADD CUSTOMER (Form) =========== -->
-                <div id="add-customer-page" class="page-content hidden">
-                    <h1 class="text-3xl font-bold text-gray-800 mb-6">Add New Customer</h1>
-                    <form id="add-customer-form" class="max-w-3xl mx-auto rounded-lg bg-white p-6 shadow-lg">
+                <!-- (REMOVED add-inventory-page) -->
+                
+                <!-- =========== PAGE: CUSTOMERS (List & Form) =========== -->
+                <div id="customers-page" class="page-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h1 class="text-3xl font-bold text-gray-800">Customers</h1>
+                        <button id="toggle-add-customer-btn" class="transform rounded-lg bg-green-600 px-5 py-2 font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-green-700">
+                            Add New Customer
+                        </button>
+                    </div>
+
+                    <!-- Add Customer Form (Hidden by default) -->
+                    <form id="add-customer-form" class="hidden max-w-3xl mx-auto rounded-lg bg-white p-6 shadow-lg mb-8">
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-6">Add New Customer</h2>
                         <div class="space-y-6">
                             <div>
                                 <label for="customer-name" class="block text-sm font-medium text-gray-700">Customer Name</label>
@@ -338,13 +341,24 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="mt-8 text-right">
+                        <div class="mt-8 flex justify-end gap-4">
+                            <button type="button" id="cancel-add-customer-btn" class="rounded-lg bg-gray-200 px-6 py-2.5 font-semibold text-gray-800 hover:bg-gray-300">
+                                Cancel
+                            </button>
                             <button type="submit" class="transform rounded-lg bg-green-600 px-6 py-2.5 font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
                                 Add Customer
                             </button>
                         </div>
                     </form>
+
+                    <!-- Customer List -->
+                    <div id="customers-loading" class="text-center text-gray-500">Loading customers...</div>
+                    <div id="customer-list-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Customer cards load here -->
+                    </div>
                 </div>
+                
+                <!-- (REMOVED add-customer-page) -->
                 
                 <!-- =========== PAGE: EXPENSES (List & Form) =========== -->
                 <div id="expenses-page" class="page-content hidden">
@@ -631,13 +645,14 @@
                 case 'share':
                     await loadShareSettings();
                     break;
-                // 'add-inventory' and 'add-customer' are just forms, no data load needed
+                // 'add-inventory' and 'add-customer' pages are gone
             }
         }
         
         // --- 4. MAIN APP: EVENT LISTENERS ---
         
         function attachMainAppListeners() {
+            // BUG FIX: Added hashchange listener
             window.addEventListener('hashchange', () => handleRouting());
             document.getElementById('logout-btn').addEventListener('click', handleLogout);
             
@@ -656,6 +671,24 @@
             document.getElementById('print-qr-btn').addEventListener('click', () => handlePrintQR('qrcode-container', 'Social Links'));
             document.getElementById('copy-collection-link-btn').addEventListener('click', () => copyShareLink('collection-link'));
             document.getElementById('print-collection-qr-btn').addEventListener('click', () => handlePrintQR('collection-qrcode-container', 'Public Collection'));
+            
+            // --- NEW LISTENERS FOR MERGED TABS ---
+            const addInventoryForm = document.getElementById('add-inventory-form');
+            const addCustomerForm = document.getElementById('add-customer-form');
+            
+            document.getElementById('toggle-add-inventory-btn').addEventListener('click', () => {
+                addInventoryForm.classList.toggle('hidden');
+            });
+            document.getElementById('cancel-add-inventory-btn').addEventListener('click', () => {
+                addInventoryForm.classList.add('hidden');
+            });
+            
+            document.getElementById('toggle-add-customer-btn').addEventListener('click', () => {
+                addCustomerForm.classList.toggle('hidden');
+            });
+            document.getElementById('cancel-add-customer-btn').addEventListener('click', () => {
+                addCustomerForm.classList.add('hidden');
+            });
         }
 
         // --- 5. PAGE: DASHBOARD (STATS & CHART) ---
@@ -1176,9 +1209,10 @@
                 if (insertError) throw new Error(`Database Error: ${insertError.message}`);
                 
                 form.reset();
+                form.classList.add('hidden'); // Hide form on success
                 showToast('Jersey added to stock!', 'success');
                 posInventoryCache = []; // Clear POS cache
-                window.location.hash = 'inventory'; // Go to inventory list
+                await loadInventoryList(); // Reload this page
             } catch (error) {
                 console.error("Error adding inventory:", error);
                 showToast(`Error: ${error.message}`, 'error');
@@ -1269,7 +1303,7 @@
             
             loadingMsg.style.display = 'none';
             if (data.length === 0) {
-                listEl.innerHTML = `<p class="col-span-full text-gray-500">No customers found. Go to "Add Customer" to add one.</p>`;
+                listEl.innerHTML = `<p class="col-span-full text-gray-500">No customers found. Click "Add New Customer" to add one.</p>`;
                 return;
             }
             
@@ -1345,8 +1379,9 @@
                 const { error } = await supabase.from('customers').insert(customer);
                 if (error) throw error;
                 form.reset();
+                form.classList.add('hidden'); // Hide form on success
                 showToast('Customer added!', 'success');
-                window.location.hash = 'customers';
+                await loadCustomerList(); // Reload this page
             } catch (error) {
                 console.error("Error adding customer:", error);
                 showToast(`Error: ${error.message}`, 'error');
@@ -1602,6 +1637,8 @@
 
         // --- 14. INITIALIZE APP ---
         document.addEventListener('DOMContentLoaded', handleRouting);
+        // BUG FIX: Added hashchange listener
+        window.addEventListener('hashchange', handleRouting);
         window.addEventListener('resize', handleRouting); // Check for mobile
     </script>
 </body>
