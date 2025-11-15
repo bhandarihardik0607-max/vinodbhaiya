@@ -24,7 +24,7 @@
         
         /* Style for file input button */
         input[type="file"]::file-selector-button {
-            @apply cursor-pointer rounded-lg border-0 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-100;
+            @apply cursor-pointer rounded-lg border-0 bg-green-50 px-4 py-2 text-sm font-semibold text-green-700 transition hover:bg-green-100;
         }
     </style>
 </head>
@@ -32,34 +32,36 @@
 
     <!-- =========== LOADING SPINNER =========== -->
     <div id="loading-spinner" class="fixed inset-0 z-50 flex h-screen w-full flex-col items-center justify-center bg-white">
-        <div class="h-16 w-16 animate-spin rounded-full border-8 border-t-blue-600 border-gray-200"></div>
+        <div class="h-16 w-16 animate-spin rounded-full border-8 border-t-green-600 border-gray-200"></div>
         <p id="loading-text" class="mt-4 text-lg font-medium text-gray-700">Loading Dashboard...</p>
     </div>
 
     <!-- =========== PUBLIC SHARE PAGE =========== -->
     <!-- This view is shown ONLY if the URL hash is #share/... -->
     <div id="share-view" class="hidden min-h-screen w-full items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 p-4">
+        <!-- This section is unchanged, it already looks attractive -->
         <div class="w-full max-w-md transform rounded-2xl bg-white p-8 text-center shadow-2xl transition-all">
             <div id="share-page-status">
                 <div class="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-t-indigo-500 border-gray-200"></div>
                 <p class="mt-4 text-lg font-medium text-gray-600">Loading contact links...</p>
             </div>
             
-            <!-- Links will be populated by JS from URL hash -->
             <div id="share-page-links" class="hidden space-y-6">
                 <h1 class="text-3xl font-bold text-gray-800">Connect With Us</h1>
                 <p class="text-lg text-gray-600">We'd love to hear from you!</p>
                 
-                <!-- WhatsApp Link -->
+                <!-- NEW: Call Us Button -->
+                <a id="call-link" href="#" target="_blank" rel="noopener noreferrer" class="group flex w-full transform items-center justify-center space-x-3 rounded-xl bg-blue-500 p-4 text-xl font-bold text-white shadow-lg transition hover:-translate-y-1 hover:bg-blue-600">
+                    <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"></path></svg>
+                    <span>Call Us</span>
+                </a>
+
                 <a id="whatsapp-link" href="#" target="_blank" rel="noopener noreferrer" class="group flex w-full transform items-center justify-center space-x-3 rounded-xl bg-green-500 p-4 text-xl font-bold text-white shadow-lg transition hover:-translate-y-1 hover:bg-green-600">
-                    <!-- SVG icon for WhatsApp -->
                     <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.06 21.94L7.3 20.58C8.77 21.39 10.37 21.82 12.04 21.82C17.5 21.82 21.95 17.37 21.95 11.91C21.95 6.45 17.5 2 12.04 2ZM17.23 15.26C16.98 15.91 15.82 16.5 15.19 16.56C14.63 16.61 13.9 16.62 13.22 16.43C12.44 16.22 11.4 15.92 10.23 14.8C8.82 13.43 7.84 11.77 7.6 11.02C7.36 10.27 7.55 9.61 7.74 9.32C7.94 9.03 8.21 8.79 8.5 8.5C8.79 8.21 8.94 8.04 9.09 7.8C9.24 7.56 9.17 7.35 9.07 7.15C8.97 6.95 8.32 5.31 8.07 4.81C7.82 4.31 7.57 4.37 7.37 4.37C7.17 4.37 6.97 4.37 6.77 4.37C6.57 4.37 6.22 4.47 5.92 4.76C5.62 5.06 4.97 5.66 4.97 6.81C4.97 7.96 5.97 9.06 6.12 9.26C6.27 9.46 7.42 11.38 9.34 12.31C10.96 13.08 11.35 13.23 11.78 13.4C12.4 13.62 12.96 13.59 13.43 13.5C13.96 13.41 15.12 12.8 15.42 12.1C15.72 11.4 15.72 10.85 15.62 10.65C15.52 10.45 15.37 10.35 15.12 10.1C14.87 9.85 13.77 9.29 13.52 9.19C13.27 9.09 13.07 9.04 12.87 9.29C12.67 9.54 12.22 10.1 12.07 10.3C11.92 10.5 11.77 10.55 11.52 10.3C11.27 10.05 10.59 9.81 9.77 9.07C9.11 8.48 8.65 7.78 8.4 7.43C8.15 7.08 8.06 6.86 8.21 6.66C8.36 6.46 8.54 6.28 8.74 6.11C8.94 5.94 9.14 5.79 9.34 5.79C9.54 5.79 9.74 5.89 9.89 6.19C10.04 6.49 10.69 8.13 10.94 8.63C11.19 9.13 11.44 9.19 11.64 9.19C11.84 9.19 12.04 9.09 12.24 8.99C12.44 8.89 13.54 8.33 13.79 8.23C14.04 8.13 14.24 8.18 14.44 8.43C14.64 8.68 15.09 9.24 15.24 9.44C15.39 9.64 15.54 9.69 15.79 9.59C16.04 9.49 16.93 8.93 17.18 8.83C17.43 8.73 17.63 8.78 17.83 9.03C18.03 9.28 18.23 9.84 18.23 10.09C18.23 10.34 18.23 10.59 18.18 10.69C18.13 10.79 17.48 11.35 17.23 15.26Z"></path></svg>
                     <span>Chat on WhatsApp</span>
                 </a>
                 
-                <!-- Instagram Link -->
                 <a id="instagram-link" href="#" target="_blank" rel="noopener noreferrer" class="group flex w-full transform items-center justify-center space-x-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 p-4 text-xl font-bold text-white shadow-lg transition hover:-translate-y-1 hover:shadow-xl">
-                    <!-- SVG icon for Instagram -->
                     <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.148 3.227-1.669 4.771-4.919 4.919-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-3.252-.148-4.771-1.691-4.919-4.919-.058-1.265-.07-1.646-.07-4.85s.012-3.584.07-4.85c.148-3.227 1.669 4.771 4.919-4.919 1.266-.058 1.646-.07 4.85-.07zm0-2.163c-3.259 0-3.667.014-4.947.072-4.286.195-6.126 2.033-6.321 6.321C.014 8.333 0 8.741 0 12s.014 3.667.072 4.947c.196 4.287 2.035 6.127 6.321 6.321C8.333 23.986 8.741 24 12 24s3.667-.014 4.947-.072c4.287-.196 6.127-2.035 6.321-6.321C23.986 15.667 24 15.259 24 12s-.014-3.667-.072-4.947c-.196-4.287-2.035-6.127-6.321-6.321C15.667.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 1 2.881.001 1.44 1.44 0 0 1-2.881-.001z"></path></svg>
                     <span>Follow on Instagram</span>
                 </a>
@@ -71,12 +73,12 @@
     <!-- =========== MAIN MANAGER APP =========== -->
     <div id="app-view" class="hidden min-h-screen w-full">
         <!-- Header -->
-        <header class="sticky top-0 z-30 w-full bg-white p-4 shadow-md">
+        <header class="sticky top-0 z-30 w-full bg-gradient-to-r from-green-600 to-teal-700 p-4 shadow-lg">
             <div class="mx-auto flex max-w-7xl items-center justify-between">
-                <h1 class="text-3xl font-bold text-blue-700">Jersey Inventory Pro</h1>
+                <h1 class="text-3xl font-bold text-white">Jersey Inventory Pro</h1>
                 <div class="text-right">
-                    <p id="user-id-display" class="text-xs text-gray-500"></p>
-                    <button id="logout-btn" class="text-sm font-medium text-blue-600 hover:underline">Logout</button>
+                    <p id="user-id-display" class="text-xs text-teal-200"></p>
+                    <button id="logout-btn" class="text-sm font-medium text-white hover:text-teal-200">Logout</button>
                 </div>
             </div>
         </header>
@@ -84,7 +86,7 @@
         <!-- Navigation Tabs -->
         <nav class="sticky top-[72px] z-20 w-full bg-white shadow-sm">
             <div class="mx-auto flex max-w-7xl justify-center space-x-2 border-b border-gray-200 px-4 sm:space-x-8">
-                <button id="nav-inventory" class="nav-tab active-tab whitespace-nowrap px-3 py-4 font-medium text-blue-600 border-b-2 border-blue-600 sm:px-6">
+                <button id="nav-inventory" class="nav-tab active-tab whitespace-nowrap px-3 py-4 font-medium text-green-600 border-b-2 border-green-600 sm:px-6">
                     Inventory
                 </button>
                 <button id="nav-customers" class="nav-tab inactive-tab whitespace-nowrap px-3 py-4 font-medium text-gray-500 hover:text-gray-700 sm:px-6">
@@ -92,10 +94,6 @@
                 </button>
                 <button id="nav-share" class="nav-tab inactive-tab whitespace-nowrap px-3 py-4 font-medium text-gray-500 hover:text-gray-700 sm:px-6">
                     Share Page
-                </button>
-                <!-- NEW: Link to the public collection -->
-                <button id="nav-collection" class="nav-tab inactive-tab whitespace-nowrap px-3 py-4 font-medium text-gray-500 hover:text-gray-700 sm:px-6">
-                    My Collection
                 </button>
             </div>
         </nav>
@@ -107,18 +105,17 @@
             <div id="inventory-tab-content" class="tab-content">
                 <!-- Add Inventory Form -->
                 <form id="add-inventory-form" class="mb-8 rounded-lg bg-white p-6 shadow-lg">
-                    <h2 class="mb-6 border-b border-gray-200 pb-3 text-2xl font-semibold text-gray-800">Add New Jersey</h2>
-                    <!-- Updated grid to 5 cols -->
+                    <h2 class="mb-6 border-b border-gray-200 pb-3 text-2xl font-semibold text-green-800">Add New Jersey</h2>
                     <div class="grid grid-cols-1 gap-6 md:grid-cols-5">
                         <!-- Jersey Name -->
                         <div>
                             <label for="jersey-name" class="block text-sm font-medium text-gray-700">Jersey Name</label>
-                            <input type="text" id="jersey-name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                            <input type="text" id="jersey-name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
                         </div>
                         <!-- Size -->
                         <div>
                             <label for="jersey-size" class="block text-sm font-medium text-gray-700">Size</label>
-                            <select id="jersey-size" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                            <select id="jersey-size" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
                                 <option>S</option>
                                 <option>M</option>
                                 <option>L</option>
@@ -130,21 +127,21 @@
                         <!-- Stock Quantity -->
                         <div>
                             <label for="jersey-stock" class="block text-sm font-medium text-gray-700">Stock Quantity</label>
-                            <input type="number" id="jersey-stock" required min="0" value="1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                            <input type="number" id="jersey-stock" required min="0" value="1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
                         </div>
                         <!-- Price -->
                         <div>
                             <label for="jersey-price" class="block text-sm font-medium text-gray-700">Price (₹)</label>
-                            <input type="number" id="jersey-price" min="0" step="1" placeholder="e.g., 1499" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                            <input type="number" id="jersey-price" min="0" step="1" placeholder="e.g., 1499" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
                         </div>
-                        <!-- NEW: Jersey Image -->
+                        <!-- Jersey Image -->
                         <div>
                             <label for="jersey-image" class="block text-sm font-medium text-gray-700">Jersey Image</label>
-                            <input type="file" id="jersey-image" accept="image/png, image/jpeg, image/webp" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"/>
+                            <input type="file" id="jersey-image" accept="image/png, image/jpeg, image/webp" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:rounded-lg file:border-0 file:bg-green-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-green-700 hover:file:bg-green-100"/>
                         </div>
                     </div>
                     <div class="mt-6 text-right">
-                        <button type="submit" id="add-stock-btn" class="transform rounded-lg bg-blue-600 px-6 py-2.5 font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        <button type="submit" id="add-stock-btn" class="transform rounded-lg bg-green-600 px-6 py-2.5 font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
                             Add to Stock
                         </button>
                     </div>
@@ -153,7 +150,6 @@
                 <!-- Inventory List -->
                 <h2 class="mb-4 text-2xl font-semibold text-gray-800">Current Stock</h2>
                 <div id="inventory-list" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    <!-- JS will populate this -->
                     <p id="inventory-loading" class="text-gray-500 col-span-full">Loading inventory...</p>
                 </div>
             </div>
@@ -162,22 +158,22 @@
             <div id="customers-tab-content" class="tab-content hidden">
                 <!-- Add Customer Form -->
                 <form id="add-customer-form" class="mb-8 rounded-lg bg-white p-6 shadow-lg">
-                    <h2 class="mb-6 border-b border-gray-200 pb-3 text-2xl font-semibold text-gray-800">Add New Customer</h2>
+                    <h2 class="mb-6 border-b border-gray-200 pb-3 text-2xl font-semibold text-green-800">Add New Customer</h2>
                     <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
                         <!-- Customer Name -->
                         <div>
                             <label for="customer-name" class="block text-sm font-medium text-gray-700">Customer Name</label>
-                            <input type="text" id="customer-name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                            <input type="text" id="customer-name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
                         </div>
                         <!-- Contact Info -->
                         <div>
                             <label for="customer-contact" class="block text-sm font-medium text-gray-700">Contact (Phone/Email)</label>
-                            <input type="text" id="customer-contact" placeholder="e.g., 9876543210" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                            <input type="text" id="customer-contact" placeholder="e.g., 9876543210" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
                         </div>
                         <!-- Category -->
                         <div>
                             <label for="customer-category" class="block text-sm font-medium text-gray-700">Category</label>
-                            <select id="customer-category" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                            <select id="customer-category" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
                                 <option value="regular">Regular</option>
                                 <option value="mid">Middle Class</option>
                                 <option value="high">High Class</option>
@@ -185,7 +181,7 @@
                         </div>
                     </div>
                     <div class="mt-6 text-right">
-                        <button type="submit" class="transform rounded-lg bg-blue-600 px-6 py-2.5 font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        <button type="submit" class="transform rounded-lg bg-green-600 px-6 py-2.5 font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
                             Add Customer
                         </button>
                     </div>
@@ -194,61 +190,61 @@
                 <!-- Customer List -->
                 <h2 class="mb-4 text-2xl font-semibold text-gray-800">Customer List</h2>
                 <div id="customer-list" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    <!-- JS will populate this -->
                     <p id="customers-loading" class="text-gray-500 col-span-full">Loading customers...</p>
                 </div>
             </div>
 
             <!-- =========== SHARE PAGE TAB =========== -->
             <div id="share-tab-content" class="tab-content hidden">
-                <!-- ... (This section is unchanged from before) ... -->
                 <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
                     <div class="rounded-lg bg-white p-6 text-center shadow-lg">
-                        <h2 class="mb-4 text-2xl font-semibold text-gray-800">Your Shareable QR Code</h2>
+                        <h2 class="mb-4 text-2xl font-semibold text-green-800">Your Shareable QR Code</h2>
                         <p class="mb-4 text-gray-600">Have customers scan this code to see your social links.</p>
                         <div id="qrcode-container" class="mx-auto flex h-64 w-64 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-gray-500">
                             Generating...
                         </div>
+                        
+                        <!-- Button Group -->
+                        <div class="mt-4 flex items-center justify-center space-x-3">
+                            <button id="print-qr-btn" class="transform rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white shadow-md transition hover:-translate-y-0.5 hover:bg-blue-700">
+                                Print QR
+                            </button>
+                            <button id="copy-link-btn" class="rounded-lg bg-gray-100 px-5 py-2 text-sm font-medium text-gray-800 hover:bg-gray-200">
+                                Copy Link
+                            </button>
+                        </div>
+
                         <div class="mt-4">
                             <p class="text-sm font-medium text-gray-700">Your unique share link:</p>
                             <input id="shareable-link" type="text" readonly class="w-full rounded-md border-none bg-gray-100 p-2 text-center text-sm text-gray-600" value="Loading..." />
-                            <button id="copy-link-btn" class="mt-2 rounded-lg bg-gray-200 px-4 py-1.5 text-sm font-medium text-gray-800 hover:bg-gray-300">Copy Link</button>
                         </div>
                     </div>
                     <div class="rounded-lg bg-white p-6 shadow-lg">
-                        <h2 class="mb-6 border-b border-gray-200 pb-3 text-2xl font-semibold text-gray-800">Configure Share Page</h2>
+                        <h2 class="mb-6 border-b border-gray-200 pb-3 text-2xl font-semibold text-green-800">Configure Share Page</h2>
                         <form id="share-settings-form" class="space-y-6">
                             <div>
                                 <label for="whatsapp-url" class="block text-sm font-medium text-gray-700">WhatsApp Link</label>
-                                <input type="url" id="whatsapp-url" placeholder="https://wa.me/919876543210" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                                <p class="mt-1 text-xs text-gray-500">Use the format `https://wa.me/91...` with your country code and number.</p>
+                                <input type="url" id="whatsapp-url" placeholder="https://wa.me/919876543210" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
+                                <p class="mt-1 text-xs text-gray-500">Use the format `https://wa.me/91...`</p>
+                            </div>
+                            <!-- NEW: Phone Number Input -->
+                            <div>
+                                <label for="phone-number" class="block text-sm font-medium text-gray-700">Phone Number (for Calls)</label>
+                                <input type="text" id="phone-number" placeholder="7793036608" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
+                                <p class="mt-1 text-xs text-gray-500">Just the 10-digit number. `+91` will be added.</p>
                             </div>
                             <div>
                                 <label for="instagram-url" class="block text-sm font-medium text-gray-700">Instagram Link</label>
-                                <input type="url" id="instagram-url" placeholder="https://instagram.com/yourprofile" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                <input type="url" id="instagram-url" placeholder="https://instagram.com/yourprofile" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
                             </div>
                             <div class="text-right">
-                                <button type="submit" class="transform rounded-lg bg-green-600 px-6 py-2.5 font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                                <button type="submit" class="transform rounded-lg bg-green-500 px-6 py-2.5 font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
                                     Save Links
                                 </button>
                             </div>
                             <p id="save-links-success" class="hidden text-center font-medium text-green-600">Links saved successfully!</p>
                         </form>
                     </div>
-                </div>
-            </div>
-            
-            <!-- =========== COLLECTION TAB (Admin Preview) =========== -->
-            <div id="collection-tab-content" class="tab-content hidden">
-                <div class="mb-4 rounded-lg bg-white p-6 shadow-lg">
-                    <h2 class="mb-2 text-2xl font-semibold text-gray-800">Public Collection Preview</h2>
-                    <p class="text-gray-600">This is a preview of what your clients will see. A direct link is available at: 
-                        <a id="public-collection-link" href="#" target="_blank" class="font-medium text-blue-600 hover:underline"></a>
-                    </p>
-                </div>
-                <!-- The public collection will be rendered inside this div -->
-                <div id="collection-preview-list" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    <p id="collection-loading" class="text-gray-500 col-span-full">Loading collection preview...</p>
                 </div>
             </div>
 
@@ -270,14 +266,14 @@
         let supabase;
         let user = null;
         
-        // Destructure Supabase client
-        const { createClient } = window.supabase; // <-- FIX: Use window.supabase
+        const { createClient } = window.supabase;
         supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // --- UPDATED COLORS ---
         const categoryClasses = {
             high: "bg-red-100 text-red-800",
             mid: "bg-yellow-100 text-yellow-800",
-            regular: "bg-blue-100 text-blue-800"
+            regular: "bg-blue-100 text-blue-800" // Changed from indigo
         };
         const categoryNames = {
             high: "High Class",
@@ -299,33 +295,22 @@
 
         // --- 2. AUTHENTICATION & ROUTING ---
 
-        /**
-         * Checks the URL hash and loads the correct view.
-         */
         function handleRouting() {
             const hash = window.location.hash;
+            loadingSpinner.style.display = 'none';
+            appView.style.display = 'none';
+            shareView.style.display = 'none';
 
-            // NEW: Public Collection View
-            if (hash.startsWith('#collection/')) {
-                // This will be handled in the next step
-                // For now, we just make sure it doesn't break the admin panel
-                // We'll add the full logic for this view later.
-                console.log("Public collection page (logic to be added)");
-                // We'll create a `loadPublicCollection()` function in the next step
-                
-            } else if (hash.startsWith('#share/')) {
-                // Public Share Page View
+            if (hash.startsWith('#share/')) {
+                shareView.style.display = 'flex';
                 loadSharePage(hash);
             } else {
-                // Main Application View
+                loadingSpinner.style.display = 'flex';
                 loadingText.textContent = 'Connecting to session...';
                 checkUserSession();
             }
         }
 
-        /**
-         * Checks for an existing user session or signs in anonymously.
-         */
         async function checkUserSession() {
             const { data, error } = await supabase.auth.getSession();
             if (error) {
@@ -333,13 +318,10 @@
                 loadingText.textContent = "Error connecting. Please refresh.";
                 return;
             }
-
             if (data.session) {
                 user = data.session.user;
-                console.log("Existing session found:", user.id);
                 await loadMainApp();
             } else {
-                // No session, sign in anonymously
                 loadingText.textContent = 'Creating secure session...';
                 await signInAnonymously();
             }
@@ -352,7 +334,6 @@
                 loadingText.textContent = "Error creating session. Please refresh.";
             } else {
                 user = data.user;
-                console.log("New anonymous session created:", user.id);
                 await loadMainApp();
             }
         }
@@ -363,34 +344,31 @@
                 console.error("Error signing out:", error);
                 showToast("Error signing out.", 'error');
             } else {
-                // Clear user and reload page to trigger new anonymous session
                 user = null;
                 window.location.hash = '';
                 window.location.reload();
             }
         }
 
-        /**
-         * Loads the public-facing share page from links in the URL hash.
-         */
         function loadSharePage(hash) {
-            loadingSpinner.style.display = 'none';
-            appView.style.display = 'none';
-            shareView.style.display = 'flex'; // Use flex for centering
-
             const statusEl = document.getElementById('share-page-status');
             const linksEl = document.getElementById('share-page-links');
-            
             try {
-                // Parse the hash
                 const params = new URLSearchParams(hash.substring(hash.indexOf('?') + 1));
                 const whatsappUrl = params.get('whatsapp');
                 const instaUrl = params.get('insta');
+                const phoneNum = params.get('phone'); // <-- ADDED
 
-                if (whatsappUrl && instaUrl) {
+                if (whatsappUrl && instaUrl && phoneNum) { // <-- UPDATED
                     document.getElementById('whatsapp-link').href = decodeURIComponent(whatsappUrl);
                     document.getElementById('instagram-link').href = decodeURIComponent(instaUrl);
-                    
+                    // --- NEW: Populate Call Link ---
+                    const callLink = document.getElementById('call-link');
+                    // Add +91 prefix for a 10-digit number
+                    const tel = phoneNum.length === 10 ? `+91${phoneNum}` : phoneNum;
+                    callLink.href = `tel:${decodeURIComponent(tel)}`;
+                    // --- END NEW ---
+
                     statusEl.style.display = 'none';
                     linksEl.style.display = 'block';
                 } else {
@@ -410,9 +388,6 @@
             errorEl.style.display = 'block';
         }
 
-        /**
-         * Loads the main private application dashboard.
-         */
         async function loadMainApp() {
             if (!user) {
                 console.error("No user found. Cannot load app.");
@@ -423,30 +398,16 @@
             shareView.style.display = 'none';
             userIdDisplay.textContent = `User ID: ${user.id.substring(0, 8)}...`;
             
-            // Set the public collection link
-            const collectionLink = `${window.location.origin}${window.location.pathname}#collection/${user.id}`;
-            const collectionLinkEl = document.getElementById('public-collection-link');
-            collectionLinkEl.href = collectionLink;
-            collectionLinkEl.textContent = collectionLink;
-            
-            // Attach all main app listeners
             attachMainAppListeners();
             
-            // Load initial data from Supabase
             await Promise.all([
                 loadInventory(),
                 loadCustomers(),
                 loadShareSettings()
             ]);
             
-            // Also load the collection preview
-            loadCollectionPreview();
-            
-            // Show the app and hide spinner
             appView.style.display = 'block';
             loadingSpinner.style.display = 'none';
-            
-            // Show default tab
             showTab('inventory');
         }
         
@@ -460,8 +421,8 @@
                 const isTarget = tab.id === `nav-${tabName}`;
                 tab.classList.toggle('active-tab', isTarget);
                 tab.classList.toggle('inactive-tab', !isTarget);
-                tab.classList.toggle('text-blue-600', isTarget);
-                tab.classList.toggle('border-blue-600', isTarget);
+                tab.classList.toggle('text-green-600', isTarget); // Updated color
+                tab.classList.toggle('border-green-600', isTarget); // Updated color
                 tab.classList.toggle('text-gray-500', !isTarget);
                 tab.classList.toggle('hover:text-gray-700', !isTarget);
                 tab.classList.toggle('border-transparent', !isTarget);
@@ -472,32 +433,24 @@
             });
         }
         
-        // --- 4. MAIN APP: EVENT LISTENERS (Attached once auth is ready) ---
+        // --- 4. MAIN APP: EVENT LISTENERS ---
         
         function attachMainAppListeners() {
-            // Tab Navigation
             document.getElementById('nav-inventory').addEventListener('click', () => showTab('inventory'));
             document.getElementById('nav-customers').addEventListener('click', () => showTab('customers'));
             document.getElementById('nav-share').addEventListener('click', () => showTab('share'));
-            document.getElementById('nav-collection').addEventListener('click', () => showTab('collection'));
             
-            // Add Forms
             document.getElementById('add-inventory-form').addEventListener('submit', handleAddInventory);
             document.getElementById('add-customer-form').addEventListener('submit', handleAddCustomer);
             document.getElementById('share-settings-form').addEventListener('submit', handleSaveShareLinks);
             
-            // Copy Link Button
             document.getElementById('copy-link-btn').addEventListener('click', copyShareLink);
-            
-            // Logout
+            document.getElementById('print-qr-btn').addEventListener('click', handlePrintQR);
             document.getElementById('logout-btn').addEventListener('click', handleLogout);
         }
 
         // --- 5. MAIN APP: INVENTORY CRUD (SUPABASE + STORAGE) ---
 
-        /**
-         * Renders the inventory list for the admin panel.
-         */
         function renderInventory(inventory) {
             inventoryLoading.style.display = 'none';
 
@@ -506,14 +459,13 @@
                 return;
             }
             
-            inventoryList.innerHTML = ''; // Clear list
+            inventoryList.innerHTML = '';
             inventory.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
             
             inventory.forEach((item) => {
                 const itemEl = document.createElement('div');
                 itemEl.className = 'flex flex-col justify-between rounded-lg bg-white shadow-lg overflow-hidden';
                 
-                // Get public URL for image
                 const placeholder = 'https://placehold.co/400x400/e2e8f0/94a3b8?text=No+Image';
                 let imageUrl = placeholder;
                 if (item.image_path) {
@@ -523,15 +475,15 @@
 
                 itemEl.innerHTML = `
                     <div>
-                        <img src="${imageUrl}" alt="${item.name}" class="h-48 w-full object-cover" onerror="this.src='${placeholder}'">
+                        <img src="${imageUrl}" alt="${item.name}" class="h-56 w-full object-cover" onerror="this.src='${placeholder}'">
                         <div class="p-5 space-y-3">
                             <div class="flex items-center justify-between">
-                                <h3 class="text-xl font-bold text-gray-900">${item.name}</h3>
-                                <span class="rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-800">
+                                <h3 class="text-xl font-bold text-green-900">${item.name}</h3>
+                                <span class="rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-800">
                                     Size: ${item.size}
                                 </span>
                             </div>
-                            <p class="text-lg font-semibold text-green-600">${item.price ? `₹${parseFloat(item.price).toFixed(2)}` : 'N/A'}</p>
+                            <p class="text-lg font-semibold text-green-700">${item.price ? `₹${parseFloat(item.price).toFixed(2)}` : 'N/A'}</p>
                             
                             <div class="flex items-center justify-between">
                                 <span class="text-gray-700">Stock:</span>
@@ -545,7 +497,7 @@
                     </div>
                     
                     <div class="p-4 bg-gray-50">
-                        <button data-id="${item.id}" data-image-path="${item.image_path || ''}" class="delete-inventory-btn w-full rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600">
+                        <button data-id="${item.id}" data-image-path="${item.image_path || ''}" class="delete-inventory-btn w-full rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">
                             Delete
                         </button>
                     </div>
@@ -553,20 +505,16 @@
                 inventoryList.appendChild(itemEl);
             });
             
-            // Add event listeners for new buttons
             document.querySelectorAll('.stock-adjust').forEach(btn => btn.addEventListener('click', handleStockAdjust));
             document.querySelectorAll('.delete-inventory-btn').forEach(btn => btn.addEventListener('click', handleDeleteInventory));
         }
 
-        /**
-         * Loads and renders inventory from Supabase.
-         */
         async function loadInventory() {
             inventoryLoading.style.display = 'block';
             const { data, error } = await supabase
                 .from('inventory')
                 .select('*')
-                .eq('user_id', user.id); // RLS ensures this
+                .eq('user_id', user.id); 
 
             if (error) {
                 console.error("Error fetching inventory:", error);
@@ -574,7 +522,7 @@
                 inventoryLoading.style.display = 'none';
                 return;
             }
-            renderInventory(data); // Pass data to render
+            renderInventory(data);
         }
         
         async function handleAddInventory(e) {
@@ -587,43 +535,34 @@
             addStockBtn.textContent = 'Uploading...';
 
             try {
-                // 1. Handle File Upload
                 if (file) {
                     const filePath = `public/${user.id}/${Date.now()}-${file.name}`;
                     const { error: uploadError } = await supabase.storage
                         .from(IMAGE_BUCKET)
                         .upload(filePath, file);
                     
-                    if (uploadError) {
-                        throw new Error(`Storage Error: ${uploadError.message}`);
-                    }
+                    if (uploadError) throw new Error(`Storage Error: ${uploadError.message}`);
                     imagePath = filePath;
                 }
 
-                // 2. Add to Database
                 const item = {
-                    user_id: user.id, // Associate with current user
+                    user_id: user.id,
                     name: form['jersey-name'].value,
                     size: form['jersey-size'].value,
                     stock: parseInt(form['jersey-stock'].value),
                     price: parseFloat(form['jersey-price'].value) || 0,
-                    image_path: imagePath, // Add the image path
+                    image_path: imagePath,
                 };
             
                 const { error: insertError } = await supabase.from('inventory').insert(item);
-                if (insertError) {
-                    throw new Error(`Database Error: ${insertError.message}`);
-                }
+                if (insertError) throw new Error(`Database Error: ${insertError.message}`);
                 
                 form.reset();
                 showToast('Jersey added to stock!', 'success');
-                await loadInventory(); // Re-fetch and render the list
-                await loadCollectionPreview(); // Also refresh the preview
+                await loadInventory();
             } catch (error) {
                 console.error("Error adding inventory:", error);
                 showToast(`Error: ${error.message}`, 'error');
-                
-                // If DB insert failed after upload, remove the orphan image
                 if (imagePath) {
                     await supabase.storage.from(IMAGE_BUCKET).remove([imagePath]);
                 }
@@ -634,7 +573,6 @@
         }
         
         async function handleStockAdjust(e) {
-            // ... (This function is unchanged from before) ...
             const id = e.target.dataset.id;
             let stock = parseInt(e.target.dataset.stock);
             
@@ -649,11 +587,8 @@
                     .from('inventory')
                     .update({ stock: stock })
                     .eq('id', id);
-                
                 if (error) throw error;
-                
-                await loadInventory(); // Re-fetch and render
-                await loadCollectionPreview(); // Also refresh the preview
+                await loadInventory();
             } catch (error) {
                 console.error("Error updating stock:", error);
                 showToast(`Error: ${error.message}`, 'error');
@@ -666,31 +601,20 @@
 
             if (confirm('Are you sure you want to delete this item?')) {
                 try {
-                    // 1. Delete from Database
                     const { error: deleteError } = await supabase
                         .from('inventory')
                         .delete()
                         .eq('id', id);
-
-                    if (deleteError) {
-                        throw new Error(`Database Error: ${deleteError.message}`);
-                    }
+                    if (deleteError) throw new Error(`Database Error: ${deleteError.message}`);
                     
-                    // 2. Delete from Storage (if image exists)
                     if (imagePath && imagePath !== 'null' && imagePath !== '') {
                         const { error: storageError } = await supabase.storage
                             .from(IMAGE_BUCKET)
                             .remove([imagePath]);
-                        
-                        if (storageError) {
-                            // Log error but don't stop, DB entry is already gone
-                            console.warn("Could not delete image from storage:", storageError.message);
-                        }
+                        if (storageError) console.warn("Could not delete image:", storageError.message);
                     }
-
                     showToast('Item deleted.', 'success');
-                    await loadInventory(); // Re-fetch and render
-                    await loadCollectionPreview(); // Also refresh the preview
+                    await loadInventory();
                 } catch (error) {
                     console.error("Error deleting item:", error);
                     showToast(`Error: ${error.message}`, 'error');
@@ -700,9 +624,6 @@
         
         // --- 6. MAIN APP: CUSTOMERS CRUD (SUPABASE + WHATSAPP) ---
 
-        /**
-         * Renders the customer list from Supabase data.
-         */
         function renderCustomers(customers) {
             customersLoading.style.display = 'none';
 
@@ -711,15 +632,13 @@
                 return;
             }
             
-            customerList.innerHTML = ''; // Clear list
+            customerList.innerHTML = '';
             customers.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
             customers.forEach((customer) => {
                 const category = customer.category || 'regular';
                 const categoryClass = categoryClasses[category];
                 const categoryName = categoryNames[category];
-                
-                // NEW: Get formatted WhatsApp link
                 const waLink = formatWhatsAppLink(customer.contact);
 
                 const customerEl = document.createElement('div');
@@ -728,7 +647,7 @@
                     <div class="p-5 space-y-4">
                         <div>
                             <div class="flex items-start justify-between">
-                                <h3 class="text-xl font-bold text-gray-900">${customer.name}</h3>
+                                <h3 class="text-xl font-bold text-green-900">${customer.name}</h3>
                                 <span class="ml-2 flex-shrink-0 rounded-full ${categoryClass} px-3 py-1 text-sm font-semibold">
                                     ${categoryName}
                                 </span>
@@ -738,7 +657,7 @@
                         
                         <div class="space-y-2">
                              <label for="cat-select-${customer.id}" class="text-sm font-medium text-gray-700">Change Category:</label>
-                             <select data-id="${customer.id}" id="cat-select-${customer.id}" class="customer-category-select w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                             <select data-id="${customer.id}" id="cat-select-${customer.id}" class="customer-category-select w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
                                 <option value="regular" ${category === 'regular' ? 'selected' : ''}>Regular</option>
                                 <option value="mid" ${category === 'mid' ? 'selected' : ''}>Middle Class</option>
                                 <option value="high" ${category === 'high' ? 'selected' : ''}>High Class</option>
@@ -748,13 +667,11 @@
 
                     <div class="grid grid-cols-2 gap-px bg-gray-50 rounded-b-lg overflow-hidden">
                         <a ${waLink ? `href="${waLink}" target="_blank"` : ''} 
-                           class="flex items-center justify-center gap-2 bg-white p-3 text-sm font-medium text-green-600 hover:bg-gray-50 ${!waLink ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-50'}">
-                            <!-- WhatsApp SVG -->
-                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.06 21.94L7.3 20.58C8.77 21.39 10.37 21.82 12.04 21.82C17.5 21.82 21.95 17.37 21.95 11.91C21.95 6.45 17.5 2 12.04 2ZM17.23 15.26C16.98 15.91 15.82 16.5 15.19 16.56C14.63 16.61 13.9 16.62 13.22 16.43C12.44 16.22 11.4 15.92 10.23 14.8C8.82 13.43 7.84 11.77 7.6 11.02C7.36 10.27 7.55 9.61 7.74 9.32C7.94 9.03 8.21 8.79 8.5 8.5C8.79 8.21 8.94 8.04 9.09 7.8C9.24 7.56 9.17 7.35 9.07 7.15C8.97 6.95 8.32 5.31 8.07 4.81C7.82 4.31 7.57 4.37 7.37 4.37C7.17 4.37 6.97 4.37 6.77 4.37C6.57 4.37 6.22 4.47 5.92 4.76C5.62 5.06 4.97 5.66 4.97 6.81C4.97 7.96 5.97 9.06 6.12 9.26C6.27 9.46 7.42 11.38 9.34 12.31C10.96 13.08 11.35 13.23 11.78 13.4C12.4 13.62 12.96 13.59 13.43 13.5C13.96 13.41 15.12 12.8 15.42 12.1C15.72 11.4 15.72 10.85 15.62 10.65C15.52 10.45 15.37 10.35 15.12 10.1C14.87 9.85 13.77 9.29 13.52 9.19C13.27 9.09 13.07 9.04 12.87 9.29C12.67 9.54 12.22 10.1 12.07 10.3C11.92 10.5 11.77 10.55 11.52 10.3C11.27 10.05 10.59 9.81 9.77 9.07C9.11 8.48 8.65 7.78 8.4 7.43C8.15 7.08 8.06 6.86 8.21 6.66C8.36 6.46 8.54 6.28 8.74 6.11C8.94 5.94 9.14 5.79 9.34 5.79C9.54 5.79 9.74 5.89 9.89 6.19C10.04 6.49 10.69 8.13 10.94 8.63C11.19 9.13 11.44 9.19 11.64 9.19C11.84 9.19 12.04 9.09 12.24 8.99C12.44 8.89 13.54 8.33 13.79 8.23C14.04 8.13 14.24 8.18 14.44 8.43C14.64 8.68 15.09 9.24 15.24 9.44C15.39 9.64 15.54 9.69 15.79 9.59C16.04 9.49 16.93 8.93 17.18 8.83C17.43 8.73 17.63 8.78 17.83 9.03C18.03 9.28 18.23 9.84 18.23 10.09C18.23 10.34 18.23 10.59 18.18 10.69C18.13 10.79 17.48 11.35 17.23 15.26Z"></path></svg>
+                           class="flex items-center justify-center gap-2 bg-white p-3 text-sm font-medium text-green-600 ${!waLink ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-50'}">
+                            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.06 21.94L7.3 20.58C8.77 21.39 10.37 21.82 12.04 21.82C17.5 21.82 21.95 17.37 21.95 11.91C21.95 6.45 17.5 2 12.04 2ZM17.23 15.26C16.98 15.91 15.82 16.5 15.19 16.56C14.63 16.61 13.9 16.62 13.22 16.43C12.44 16.22 11.4 15.92 10.23 14.8C8.82 13.43 7.84 11.77 7.6 11.02C7.36 10.27 7.55 9.61 7.74 9.32C7.94 9.03 8.21 8.79 8.5 8.5C8.79 8.21 8.94 8.04 9.09 7.8C9.24 7.56 9.17 7.35 9.07 7.15C8.97 6.95 8.32 5.31 8.07 4.81C7.82 4.31 7.57 4.37 7.37 4.37C7.17 4.37 6.97 4.37 6.77 4.37C6.57 4.37 6.22 4.47 5.92 4.76C5.62 5.06 4.97 5.66 4.97 6.81C4.97 7.96 5.97 9.06 6.12 9.26C6.27 9.46 7.42 11.38 9.34 12.31C10.96 13.08 11.35 13.23 11.78 13.4C12.4 13.62 12.96 13.59 13.43 13.5C13.96 13.41 15.12 12.8 15.42 12.1C15.72 11.4 15.72 10.85 15.62 10.65C15.52 10.45 15.37 10.35 15.12 10.1C14.87 9.85 13.77 9.29 13.52 9.19C13.27 9.09 13.07 9.04 12.87 9.29C12.67 9.54 12.22 10.1 12.07 10.3C11.92 10.5 11.77 10.55 11.52 10.3C11.27 10.05 10.59 9.81 9.77 9.07C9.11 8.48 8.65 7.78 8.4 7.43C8.15 7.08 8.06 6.86 8.21 6.66C8.36 6.46 8.54 6.28 8.74 6.11C8.94 5.94 9.14 5.79 9.34 5.79C9.54 5.79 9.74 5.89 9.89 6.19C10.04 6.49 10.69 8.13 10.94 8.63C11.19 9.13 11.44 9.19 11.64 9.19C11.84 9.19 12.04 9.09 12.24 8.99C12.44 8.89 13.54 8.33 13.79 8.23C14.04 8.13 14.24 8.18 14.44 8.43C14.64 8.68 15.09 9.24 15.24 9.44C15.39 9.64 15.54 9.69 15.79 9.59C16.04 9.49 16.93 8.93 17.18 8.83C17.43 8.73 17.63 8.78 17.83 9.03C18.03 9.28 18.23 9.84 18.23 10.09C1E+23 10.34 18.23 10.59 18.18 10.69C18.13 10.79 17.48 11.35 17.23 15.26Z"></path></svg>
                             <span>Chat</span>
                         </a>
                         <button data-id="${customer.id}" class="delete-customer-btn flex items-center justify-center gap-2 bg-white p-3 text-sm font-medium text-red-600 hover:bg-red-50">
-                            <!-- Delete SVG -->
                             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd"></path></svg>
                             Delete
                         </button>
@@ -763,38 +680,23 @@
                 customerList.appendChild(customerEl);
             });
             
-            // Add event listeners for new buttons
             document.querySelectorAll('.customer-category-select').forEach(sel => sel.addEventListener('change', handleCategoryChange));
             document.querySelectorAll('.delete-customer-btn').forEach(btn => btn.addEventListener('click', handleDeleteCustomer));
         }
         
-        /**
-         * Formats a contact string into a valid wa.me link for India.
-         * @param {string} contact - The contact string (phone or email).
-         * @returns {string|null} A valid wa.me link or null.
-         */
         function formatWhatsAppLink(contact) {
             if (!contact) return null;
-            // Remove all non-numeric characters
             const digits = contact.replace(/\D/g, '');
-            
-            // Check for 10-digit Indian number
             if (digits.length === 10 && ['6','7','8','9'].includes(digits[0])) {
                 return `https://wa.me/91${digits}`;
             }
-            // Check for 12-digit number already with 91
             if (digits.length === 12 && digits.startsWith('91')) {
                 return `https://wa.me/${digits}`;
             }
-            // Not a valid Indian mobile number
             return null;
         }
 
-        /**
-         * Loads and renders customers from Supabase.
-         */
         async function loadCustomers() {
-            // ... (This function is unchanged) ...
             customersLoading.style.display = 'block';
             const { data, error } = await supabase
                 .from('customers')
@@ -811,7 +713,6 @@
         }
         
         async function handleAddCustomer(e) {
-            // ... (This function is unchanged) ...
             e.preventDefault();
             const form = e.target;
             const customer = {
@@ -824,10 +725,9 @@
             try {
                 const { error } = await supabase.from('customers').insert(customer);
                 if (error) throw error;
-                
                 form.reset();
                 showToast('Customer added!', 'success');
-                await loadCustomers(); // Re-fetch and render
+                await loadCustomers();
             } catch (error) {
                 console.error("Error adding customer:", error);
                 showToast(`Error: ${error.message}`, 'error');
@@ -835,20 +735,16 @@
         }
         
         async function handleCategoryChange(e) {
-            // ... (This function is unchanged) ...
             const id = e.target.dataset.id;
             const newCategory = e.target.value;
-            
             try {
                 const { error } = await supabase
                     .from('customers')
                     .update({ category: newCategory })
                     .eq('id', id);
-                    
                 if (error) throw error;
-                
                 showToast('Category updated.', 'success');
-                await loadCustomers(); // Re-fetch and render
+                await loadCustomers();
             } catch (error) {
                 console.error("Error updating category:", error);
                 showToast(`Error: ${error.message}`, 'error');
@@ -856,7 +752,6 @@
         }
         
         async function handleDeleteCustomer(e) {
-            // ... (This function is unchanged) ...
             const id = e.target.dataset.id;
             if (confirm('Are you sure you want to delete this customer?')) {
                 try {
@@ -864,11 +759,9 @@
                         .from('customers')
                         .delete()
                         .eq('id', id);
-
                     if (error) throw error;
-                    
                     showToast('Customer deleted.', 'success');
-                    await loadCustomers(); // Re-fetch and render
+                    await loadCustomers();
                 } catch (error) {
                     console.error("Error deleting customer:", error);
                     showToast(`Error: ${error.message}`, 'error');
@@ -877,7 +770,6 @@
         }
 
         // --- 7. MAIN APP: SHARE PAGE SETTINGS (SUPABASE) ---
-        // ... (This section is unchanged from before) ...
         async function loadShareSettings() {
             const { data, error } = await supabase
                 .from('settings')
@@ -886,24 +778,31 @@
                 .limit(1)
                 .single();
 
-            let whatsappUrl = '';
-            let instaUrl = '';
+            // --- MODIFICATION: Set default URLs ---
+            let whatsappUrl = 'https://wa.me/917793036608'; // Default
+            let instaUrl = 'https://www.instagram.com/ommensfashion?igsh=YWtrNnlhZmoycmpp'; // Default
+            let phoneNumber = '7793036608'; // <-- ADDED DEFAULT
 
             if (data) {
-                whatsappUrl = data.whatsapp || '';
-                instaUrl = data.instagram || '';
+                // Use saved data if it exists, otherwise fall back to the defaults
+                whatsappUrl = data.whatsapp || whatsappUrl;
+                instaUrl = data.instagram || instaUrl;
+                phoneNumber = data.phone || phoneNumber; // <-- ADDED
             } else if (error && error.code !== 'PGRST116') {
                 console.error("Error loading settings:", error);
                 showToast('Error loading share settings.', 'error');
             }
+            // --- END MODIFICATION ---
 
             document.getElementById('whatsapp-url').value = whatsappUrl;
             document.getElementById('instagram-url').value = instaUrl;
+            document.getElementById('phone-number').value = phoneNumber; // <-- ADDED
 
             const baseUrl = `${window.location.origin}${window.location.pathname}`;
             const shareParams = new URLSearchParams();
             shareParams.set('whatsapp', whatsappUrl);
             shareParams.set('insta', instaUrl);
+            shareParams.set('phone', phoneNumber); // <-- ADDED
             
             const shareLink = `${baseUrl}#share/?${shareParams.toString()}`;
             
@@ -932,13 +831,13 @@
                 user_id: user.id,
                 whatsapp: document.getElementById('whatsapp-url').value,
                 instagram: document.getElementById('instagram-url').value,
+                phone: document.getElementById('phone-number').value, // <-- ADDED
             };
             
             try {
                 const { error } = await supabase
                     .from('settings')
                     .upsert(links, { onConflict: 'user_id' });
-
                 if (error) throw error;
 
                 const successMsg = document.getElementById('save-links-success');
@@ -966,77 +865,53 @@
             }
         }
 
-        // --- 8. NEW: COLLECTION PREVIEW ---
-        
-        /**
-         * Loads and renders the public collection for the admin preview.
-         */
-        async function loadCollectionPreview() {
-            const loadingEl = document.getElementById('collection-loading');
-            const listEl = document.getElementById('collection-preview-list');
-            loadingEl.style.display = 'block';
-            
-            // This is a public query, but we filter by our own user.id
-            // The final client page will filter by user_id from the URL.
-            const { data, error } = await supabase
-                .from('inventory')
-                .select('*')
-                .eq('user_id', user.id);
-                
-            if (error) {
-                console.error("Error fetching collection:", error);
-                loadingEl.innerHTML = '<p class="text-red-500 col-span-full">Error loading collection preview.</p>';
+        // --- NEW FUNCTION: Print QR ---
+        function handlePrintQR() {
+            const qrContainer = document.getElementById('qrcode-container');
+            const qrImage = qrContainer.querySelector('img');
+
+            if (!qrImage) {
+                showToast('QR Code not yet generated.', 'error');
                 return;
             }
+
+            // Create a new window for printing
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write('<html><head><title>Print QR Code</title>');
+            // --- UPDATED: More attractive print layout ---
+            printWindow.document.write('<style>body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; text-align: center; margin-top: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; } img { width: 300px; height: 300px; margin-top: 20px; } h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0; } p { font-size: 1.25rem; color: #4A5568; margin-top: 10px; }</style>');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write('<h1>Ommen\'s Fashion</h1>');
+            printWindow.document.write('<p>Scan to connect with us!</p>');
+            printWindow.document.write('<img src="' + qrImage.src + '">');
+            // --- END UPDATE ---
+            printWindow.document.write('</body></html>');
             
-            loadingEl.style.display = 'none';
-            listEl.innerHTML = ''; // Clear list
+            printWindow.document.close();
+            printWindow.focus();
             
-            if (data.length === 0) {
-                 listEl.innerHTML = '<p class="text-gray-500 col-span-full">Your collection is empty. Add items in the "Inventory" tab to see them here.</p>';
-                 return;
-            }
-            
-            // Sort to show in-stock items first
-            data.sort((a, b) => (a.stock > 0 ? -1 : 1) - (b.stock > 0 ? -1 : 1) || new Date(b.created_at) - new Date(a.created_at));
-            
-            data.forEach(item => {
-                const placeholder = 'https://placehold.co/400x400/e2e8f0/94a3b8?text=No+Image';
-                let imageUrl = placeholder;
-                if (item.image_path) {
-                    const { data } = supabase.storage.from(IMAGE_BUCKET).getPublicUrl(item.image_path);
-                    if (data) imageUrl = data.publicUrl;
-                }
-                
-                const inStock = item.stock > 0;
-                
-                const itemEl = document.createElement('div');
-                itemEl.className = `relative rounded-lg bg-white shadow-lg overflow-hidden ${!inStock ? 'opacity-60' : ''}`;
-                itemEl.innerHTML = `
-                    <div class="absolute top-4 right-4 z-10 rounded-full px-3 py-1 text-sm font-semibold text-white ${inStock ? 'bg-green-600' : 'bg-red-600'}">
-                        ${inStock ? 'In Stock' : 'Out of Stock'}
-                    </div>
-                    <img src="${imageUrl}" alt="${item.name}" class="h-64 w-full object-cover" onerror="this.src='${placeholder}'">
-                    <div class="p-5">
-                        <h3 class="text-xl font-bold text-gray-900">${item.name}</h3>
-                        <p class="text-gray-600">Size: ${item.size}</p>
-                        <p class="mt-2 text-lg font-semibold text-blue-700">${item.price ? `₹${parseFloat(item.price).toFixed(2)}` : 'Price on request'}</p>
-                    </div>
-                `;
-                listEl.appendChild(itemEl);
-            });
+            // Use a slight delay to ensure the image loads
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 500);
         }
 
+        // --- 8. (COLLECTION LOGIC REMOVED) ---
 
         // --- 9. UTILITIES ---
         
         function showToast(message, type = 'success') {
-            // ... (This function is unchanged) ...
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toast-message');
             
             toastMessage.textContent = message;
-            toast.className = `fixed bottom-10 right-10 z-50 transform rounded-lg px-5 py-3 text-white shadow-lg ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`;
+            // Updated toast colors for better theme consistency
+            if (type === 'success') {
+                toast.className = 'fixed bottom-10 right-10 z-50 transform rounded-lg px-5 py-3 text-white shadow-lg bg-green-600';
+            } else {
+                toast.className = 'fixed bottom-10 right-10 z-50 transform rounded-lg px-5 py-3 text-white shadow-lg bg-red-700';
+            }
             
             toast.style.display = 'block';
             toast.style.opacity = '1';
@@ -1049,9 +924,7 @@
 
         // --- 10. INITIALIZE APP ---
         
-        // Start the app by checking the URL
         document.addEventListener('DOMContentLoaded', handleRouting);
-        // Also handle routing if the user manually changes the hash
         window.addEventListener('hashchange', handleRouting);
 
     </script>
