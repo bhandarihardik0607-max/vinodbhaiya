@@ -14,7 +14,7 @@
     <!-- 3. Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <!-- 4. Chart.js for Dashboard (optional, but good for reports) -->
+    <!-- 4. Chart.js for Dashboard -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
@@ -132,9 +132,8 @@
                                 <p id="stat-revenue" class="text-2xl font-bold text-gray-900">₹0.00</p>
                             </div>
                         </div>
-                        <div class="bg-white rounded-lg shadow-lg p-6 flex items-center">
-                            <div class="bg-blue-100 rounded-full p-3">
-                                <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 8h6m-4 4h4m2 0h-2m2 0h2M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <div class="bg-blue-100 rounded-full p-3">
+                            <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 8h6m-4 4h4m2 0h-2m2 0h2M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                             </div>
                             <div class="ml-4">
                                 <p class="text-sm font-medium text-gray-500">Total Expenses</p>
@@ -483,7 +482,7 @@
     <script type="module">
         // --- 1. SUPABASE & APP STATE ---
         const SUPABASE_URL = 'https://axjetoaqrybsfohqhtll.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4amV0b2Fxcnlic2ZvaHFodGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxNzUwMjksImV4cCI6MjA3ODc1MTAyOX0.Q5C5LAANqBn2rD-VJtG-CxUQ9aupHzgt1OSMNClI8x4';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4amV0b2Fxcnlic2ZvaHFodGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxNzUwMjksImV4cCI6MjA3ODc1MTAyOX0.Q5C5LAANqBn2rD-VJtG-CxUQ9aupHzgt1OSMNClI8x4';
         const IMAGE_BUCKET = 'jersey-images';
 
         let supabase;
@@ -582,8 +581,9 @@
             attachMainAppListeners();
             
             // Set default route to dashboard
-            window.location.hash = 'dashboard';
-            await showPage('dashboard');
+            const defaultPage = window.location.hash.replace('#', '') || 'dashboard';
+            window.location.hash = defaultPage;
+            await showPage(defaultPage);
             
             loadingSpinner.style.display = 'none';
         }
@@ -591,7 +591,7 @@
         // --- 3. MAIN APP: PAGE NAVIGATION ---
 
         async function showPage(pageName) {
-            if (!user && pageName !== 'share') {
+            if (!user) {
                 // If user is somehow lost, re-auth
                 checkUserSession();
                 return;
@@ -893,6 +893,7 @@
                     const item = posCart.find(cartItem => cartItem.id === id);
                     if (newQty > item.stock) {
                         newQty = item.stock;
+                        e.target.value = newQty;
                         showToast(`Only ${item.stock} in stock.`, 'error');
                     }
                     if (newQty < 1) newQty = 1;
@@ -1129,7 +1130,8 @@
                         </div>
                     </div>
                     <div class="p-4 bg-gray-50 grid grid-cols-2 gap-2">
-                        <button data-id="${item.id}" class="edit-inventory-btn w-full rounded-lg bg-yellow-500 px-4 py-2 text-sm font-medium text-white hover:bg-yellow-600">Edit</button>
+                        <!-- 'Edit' button placeholder, can be implemented later -->
+                        <button disabled class="w-full rounded-lg bg-yellow-500 px-4 py-2 text-sm font-medium text-white opacity-50 cursor-not-allowed">Edit</button>
                         <button data-id="${item.id}" data-image-path="${item.image_path || ''}" class="delete-inventory-btn w-full rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">Delete</button>
                     </div>
                 `;
@@ -1137,7 +1139,6 @@
             });
             
             document.querySelectorAll('.delete-inventory-btn').forEach(btn => btn.addEventListener('click', handleDeleteInventory));
-            // Add listeners for 'edit' when functionality is built
         }
         
         async function handleAddInventory(e) {
@@ -1176,6 +1177,7 @@
                 
                 form.reset();
                 showToast('Jersey added to stock!', 'success');
+                posInventoryCache = []; // Clear POS cache
                 window.location.hash = 'inventory'; // Go to inventory list
             } catch (error) {
                 console.error("Error adding inventory:", error);
@@ -1195,19 +1197,38 @@
 
             if (confirm('Are you sure you want to delete this item?')) {
                 try {
-                    const { error: deleteError } = await supabase
-                        .from('inventory')
-                        .delete()
-                        .eq('id', id);
-                    if (deleteError) throw new Error(`Database Error: ${deleteError.message}`);
-                    
-                    if (imagePath && imagePath !== 'null' && imagePath !== '') {
-                        const { error: storageError } = await supabase.storage
-                            .from(IMAGE_BUCKET)
-                            .remove([imagePath]);
-                        if (storageError) console.warn("Could not delete image:", storageError.message);
+                    // Check if item is in sales_items
+                    const { data, error: checkError } = await supabase
+                        .from('sales_items')
+                        .select('id')
+                        .eq('inventory_id', id)
+                        .limit(1);
+
+                    if (checkError) throw checkError;
+
+                    if (data.length > 0) {
+                        // Item has been sold. Don't delete, just set stock to 0.
+                        const { error: updateError } = await supabase
+                            .from('inventory')
+                            .update({ stock: 0 })
+                            .eq('id', id);
+                        if (updateError) throw updateError;
+                        showToast('Item is part of sales history. Stock set to 0 instead of deleting.', 'success');
+                    } else {
+                        // Item not sold, safe to delete.
+                        const { error: deleteError } = await supabase
+                            .from('inventory')
+                            .delete()
+                            .eq('id', id);
+                        if (deleteError) throw deleteError;
+                        
+                        if (imagePath && imagePath !== 'null' && imagePath !== '') {
+                            await supabase.storage.from(IMAGE_BUCKET).remove([imagePath]);
+                        }
+                        showToast('Item deleted.', 'success');
                     }
-                    showToast('Item deleted.', 'success');
+                    
+                    posInventoryCache = []; // Clear POS cache
                     await loadInventoryList(); // Reload this page
                 } catch (error) {
                     console.error("Error deleting item:", error);
@@ -1481,9 +1502,9 @@
             shareParams.set('insta', instaUrl);
             shareParams.set('phone', phoneNumber);
             
-            // This link format `#share/?...` is for the *old* app
-            // We'll keep it for now, but a separate file is better
-            const shareLink = `${baseUrl}#share/?${shareParams.toString()}`;
+            // This link is for a *separate* social media lander, if you build one.
+            // For now, it's just a placeholder.
+            const shareLink = `${baseUrl}socials.html?${shareParams.toString()}`;
             document.getElementById('shareable-link').value = shareLink;
             
             const qrContainer = document.getElementById('qrcode-container');
